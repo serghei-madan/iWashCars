@@ -1,0 +1,213 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iWashCars - Premium Mobile Car Wash Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar bg-primary text-primary-content">
+        <div class="navbar-start">
+            <div class="dropdown">
+                <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
+                    </svg>
+                </div>
+                <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow text-base-content">
+                    <li><a>Services</a></li>
+                    <li><a>Pricing</a></li>
+                    <li><a>About</a></li>
+                    <li><a>Contact</a></li>
+                </ul>
+            </div>
+            <a class="btn btn-ghost text-xl font-bold">🚗 iWashCars</a>
+        </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                <li><a class="hover:bg-primary-focus">Services</a></li>
+                <li><a class="hover:bg-primary-focus">Pricing</a></li>
+                <li><a class="hover:bg-primary-focus">About</a></li>
+                <li><a class="hover:bg-primary-focus">Contact</a></li>
+            </ul>
+        </div>
+        <div class="navbar-end">
+            <a href="{% url 'booking' %}" class="btn btn-secondary">Book Now</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero min-h-screen bg-gradient-to-r from-blue-500 to-blue-700">
+        <div class="hero-content text-center text-white">
+            <div class="max-w-md">
+                <h1 class="text-5xl font-bold mb-5">Premium Mobile Car Wash</h1>
+                <p class="text-xl mb-5">We come to you! Professional car washing service at your doorstep. Eco-friendly products, experienced team, and unmatched convenience.</p>
+                <a href="{% url 'booking' %}" class="btn btn-secondary btn-lg">Book Your Wash</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Section -->
+    <div class="py-16 bg-base-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12">Our Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {% for service in services %}
+                <div class="card bg-base-200 shadow-xl{% if service.tier == 'premium' %} border-2 border-secondary{% endif %}">
+                    {% if service.tier == 'premium' %}
+                    <div class="badge badge-secondary absolute top-4 right-4">Popular</div>
+                    {% endif %}
+                    <div class="card-body text-center">
+                        <div class="text-4xl mb-4">
+                            {% if service.tier == 'basic' %}🧽
+                            {% elif service.tier == 'premium' %}✨
+                            {% elif service.tier == 'deluxe' %}👑
+                            {% endif %}
+                        </div>
+                        <h3 class="card-title justify-center">{{ service.name }}</h3>
+                        <p>{{ service.description|truncatewords:10 }}</p>
+                        <div class="text-2xl font-bold text-primary mt-4">${{ service.price }}</div>
+                        <div class="text-sm text-base-content opacity-70 mb-4">{{ service.get_duration_display }}</div>
+                        <div class="card-actions justify-center mt-4">
+                            <a href="{% url 'booking' %}" class="btn {% if service.tier == 'premium' %}btn-secondary{% else %}btn-primary{% endif %}">Choose {{ service.tier|title }}</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-3 text-center">
+                    <p class="text-xl text-gray-600">No services available at the moment.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="py-16 bg-base-200">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12">Why Choose iWashCars?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="text-5xl mb-4">📱</div>
+                    <h3 class="text-xl font-bold mb-2">Easy Booking</h3>
+                    <p>Book online or via mobile app in just a few clicks</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl mb-4">🌿</div>
+                    <h3 class="text-xl font-bold mb-2">Eco-Friendly</h3>
+                    <p>Biodegradable products and water-saving techniques</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl mb-4">⚡</div>
+                    <h3 class="text-xl font-bold mb-2">Fast Service</h3>
+                    <p>Professional wash completed in 30-45 minutes</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl mb-4">💯</div>
+                    <h3 class="text-xl font-bold mb-2">Satisfaction Guaranteed</h3>
+                    <p>100% satisfaction guarantee or we'll re-wash for free</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials -->
+    <div class="py-16 bg-base-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12">What Our Customers Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <div class="rating mb-4">
+                            <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                        </div>
+                        <p>"Amazing service! They came right to my office and my car looked brand new. Highly recommended!"</p>
+                        <div class="mt-4">
+                            <p class="font-bold">- Sarah M.</p>
+                            <p class="text-sm opacity-70">Regular Customer</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <div class="rating mb-4">
+                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                        </div>
+                        <p>"Professional, punctual, and affordable. The deluxe wash made my car shine like never before!"</p>
+                        <div class="mt-4">
+                            <p class="font-bold">- Mike R.</p>
+                            <p class="text-sm opacity-70">Business Owner</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <div class="rating mb-4">
+                            <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                            <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                        </div>
+                        <p>"Convenient booking, great communication, and excellent results. I'm a customer for life!"</p>
+                        <div class="mt-4">
+                            <p class="font-bold">- Jennifer L.</p>
+                            <p class="text-sm opacity-70">Marketing Manager</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="hero py-16 bg-gradient-to-r from-secondary to-accent">
+        <div class="hero-content text-center text-white">
+            <div class="max-w-md">
+                <h2 class="text-4xl font-bold mb-5">Ready to Get Started?</h2>
+                <p class="text-lg mb-8">Book your mobile car wash today and experience the convenience of professional service at your location.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'booking' %}" class="btn btn-primary btn-lg">Book Now</a>
+                    <a href="{% url 'booking' %}" class="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-secondary">Get Quote</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content">
+        <nav class="grid grid-flow-col gap-4">
+            <a class="link link-hover">About us</a>
+            <a class="link link-hover">Contact</a>
+            <a class="link link-hover">Services</a>
+            <a class="link link-hover">Privacy Policy</a>
+        </nav>
+        <nav>
+            <div class="grid grid-flow-col gap-4">
+                <a class="text-2xl hover:text-primary">📧</a>
+                <a class="text-2xl hover:text-primary">📱</a>
+                <a class="text-2xl hover:text-primary">📍</a>
+            </div>
+        </nav>
+        <aside>
+            <p>Copyright © 2024 - All rights reserved by iWashCars</p>
+            <p class="text-sm opacity-70">📞 (555) 123-WASH | 📧 info@iwashcars.com</p>
+        </aside>
+    </footer>
+</body>
+</html>

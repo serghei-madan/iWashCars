@@ -1,0 +1,342 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Car Wash - iWashCars</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar bg-primary text-primary-content">
+        <div class="navbar-start">
+            <a href="{% url 'index' %}" class="btn btn-ghost text-xl font-bold">🚗 iWashCars</a>
+        </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="{% url 'index' %}" class="hover:bg-primary-focus">Home</a></li>
+                <li><a class="hover:bg-primary-focus bg-primary-focus">Book Now</a></li>
+            </ul>
+        </div>
+        <div class="navbar-end">
+            <a href="{% url 'index' %}" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Booking Form -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl font-bold text-center mb-8">Book Your Car Wash</h1>
+
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-success mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <form method="post" id="booking-form">
+                        {% csrf_token %}
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Left Column - Customer Info -->
+                            <div>
+                                <h2 class="text-2xl font-bold mb-6">Customer Information</h2>
+
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div class="form-control">
+                                        <label class="label">
+                                            <span class="label-text">First Name *</span>
+                                        </label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <label class="label">
+                                                <span class="label-text-alt text-error">{{ form.first_name.errors.0 }}</span>
+                                            </label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-control">
+                                        <label class="label">
+                                            <span class="label-text">Last Name *</span>
+                                        </label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <label class="label">
+                                                <span class="label-text-alt text-error">{{ form.last_name.errors.0 }}</span>
+                                            </label>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="form-control mb-4">
+                                    <label class="label">
+                                        <span class="label-text">Email Address *</span>
+                                    </label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <label class="label">
+                                            <span class="label-text-alt text-error">{{ form.email.errors.0 }}</span>
+                                        </label>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-control mb-6">
+                                    <label class="label">
+                                        <span class="label-text">Phone Number</span>
+                                    </label>
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                        <label class="label">
+                                            <span class="label-text-alt text-error">{{ form.phone.errors.0 }}</span>
+                                        </label>
+                                    {% endif %}
+                                </div>
+
+                                <h3 class="text-xl font-bold mb-4">Service Location</h3>
+
+                                <div class="form-control mb-4">
+                                    <label class="label">
+                                        <span class="label-text">Address *</span>
+                                    </label>
+                                    {{ form.address }}
+                                    {% if form.address.errors %}
+                                        <label class="label">
+                                            <span class="label-text-alt text-error">{{ form.address.errors.0 }}</span>
+                                        </label>
+                                    {% endif %}
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="form-control">
+                                        <label class="label">
+                                            <span class="label-text">City *</span>
+                                        </label>
+                                        {{ form.city }}
+                                        {% if form.city.errors %}
+                                            <label class="label">
+                                                <span class="label-text-alt text-error">{{ form.city.errors.0 }}</span>
+                                            </label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-control">
+                                        <label class="label">
+                                            <span class="label-text">ZIP Code *</span>
+                                        </label>
+                                        {{ form.zip_code }}
+                                        {% if form.zip_code.errors %}
+                                            <label class="label">
+                                                <span class="label-text-alt text-error">{{ form.zip_code.errors.0 }}</span>
+                                            </label>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column - Service & Schedule -->
+                            <div>
+                                <h2 class="text-2xl font-bold mb-6">Service & Schedule</h2>
+
+                                <div class="form-control mb-6">
+                                    <label class="label">
+                                        <span class="label-text">Service Type *</span>
+                                    </label>
+                                    {{ form.service }}
+                                    {% if form.service.errors %}
+                                        <label class="label">
+                                            <span class="label-text-alt text-error">{{ form.service.errors.0 }}</span>
+                                        </label>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Service Details Display -->
+                                <div id="service-details" class="bg-base-200 p-4 rounded-lg mb-6" style="display: none;">
+                                    <h4 class="font-bold mb-2">Service Details</h4>
+                                    <div id="service-info" class="text-sm text-base-content">
+                                        <!-- Service details will be populated by JavaScript -->
+                                    </div>
+                                    <a id="see-details-link" href="#" class="btn btn-link p-0" target="_blank" style="display: none;">
+                                        See Full Details
+                                    </a>
+                                </div>
+
+                                <div class="form-control mb-6">
+                                    <label class="label">
+                                        <span class="label-text">Preferred Date *</span>
+                                    </label>
+                                    {{ form.booking_date }}
+                                    {% if form.booking_date.errors %}
+                                        <label class="label">
+                                            <span class="label-text-alt text-error">{{ form.booking_date.errors.0 }}</span>
+                                        </label>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-control mb-6">
+                                    <label class="label">
+                                        <span class="label-text">Time Slot *</span>
+                                    </label>
+                                    {{ form.booking_time }}
+                                    {% if form.booking_time.errors %}
+                                        <label class="label">
+                                            <span class="label-text-alt text-error">{{ form.booking_time.errors.0 }}</span>
+                                        </label>
+                                    {% endif %}
+                                    <label class="label">
+                                        <span class="label-text-alt">Available slots are 8:00 AM - 6:00 PM (every 30 minutes)</span>
+                                    </label>
+                                </div>
+
+                                <!-- Available Time Slots Display -->
+                                <div class="bg-base-200 p-4 rounded-lg mb-6">
+                                    <h4 class="font-bold mb-2">Available Time Slots</h4>
+                                    <div id="time-slots" class="text-sm text-base-content">
+                                        Select a date to see available time slots
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="flex justify-center">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                📅 Book My Car Wash
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const unavailableSlots = {{ unavailable_slots|safe }};
+        const serviceData = {{ service_data|safe }};
+        const bookingDateInput = document.getElementById('booking-date');
+        const bookingTimeSelect = document.getElementById('booking-time');
+        const timeSlotsDiv = document.getElementById('time-slots');
+        const serviceSelect = document.getElementById('service-select');
+        const serviceDetailsDiv = document.getElementById('service-details');
+        const serviceInfoDiv = document.getElementById('service-info');
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        bookingDateInput.min = today;
+
+        function updateAvailableTimeSlots() {
+            const selectedDate = bookingDateInput.value;
+            if (!selectedDate) {
+                timeSlotsDiv.innerHTML = 'Select a date to see available time slots';
+                return;
+            }
+
+            const unavailableForDate = unavailableSlots[selectedDate] || [];
+            const allOptions = Array.from(bookingTimeSelect.options);
+
+            console.log('Selected date:', selectedDate);
+            console.log('All options count:', allOptions.length);
+            console.log('Unavailable slots for this date:', unavailableForDate);
+
+            let availableSlots = [];
+            let unavailableCount = 0;
+
+            allOptions.forEach(option => {
+                // Skip the empty "Select a time" option
+                if (option.value && option.value !== '') {
+                    if (unavailableForDate.includes(option.value)) {
+                        option.disabled = true;
+                        option.style.color = '#999';
+                        unavailableCount++;
+                    } else {
+                        option.disabled = false;
+                        option.style.color = '';
+                        availableSlots.push(option.text);
+                    }
+                }
+            });
+
+            console.log('Available slots:', availableSlots.length);
+            console.log('Unavailable count:', unavailableCount);
+
+            if (availableSlots.length === 0 && allOptions.length > 1) {
+                timeSlotsDiv.innerHTML = '<span class="text-error">❌ All slots are booked for this date</span>';
+            } else if (availableSlots.length === 0) {
+                timeSlotsDiv.innerHTML = '<span class="text-warning">⏳ Loading time slots...</span>';
+                // If no slots loaded yet, wait a bit and try again
+                setTimeout(updateAvailableTimeSlots, 500);
+            } else {
+                timeSlotsDiv.innerHTML = `
+                    <span class="text-success">✅ ${availableSlots.length} slots available</span>
+                    ${unavailableCount > 0 ? `<br><span class="text-warning">⚠️ ${unavailableCount} slots already booked</span>` : ''}
+                `;
+            }
+        }
+
+        function updateServiceDetails() {
+            const selectedServiceId = serviceSelect.value;
+            const seeDetailsLink = document.getElementById('see-details-link');
+
+            if (!selectedServiceId || !serviceData[selectedServiceId]) {
+                serviceDetailsDiv.style.display = 'none';
+                seeDetailsLink.style.display = 'none';
+                return;
+            }
+
+            const service = serviceData[selectedServiceId];
+            const duration = service.duration_minutes;
+            const hours = Math.floor(duration / 60);
+            const minutes = duration % 60;
+            const durationText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+
+            serviceInfoDiv.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p><strong>Service:</strong> ${service.name}</p>
+                        <p><strong>Price:</strong> $${service.price}</p>
+                        <p><strong>Duration:</strong> ${durationText}</p>
+                    </div>
+                    <div>
+                        <p><strong>Description:</strong></p>
+                        <p class="text-sm">${service.description}</p>
+                    </div>
+                </div>
+            `;
+
+            // Update the see details link
+            seeDetailsLink.href = `/service/${selectedServiceId}/`;
+            seeDetailsLink.style.display = 'inline-block';
+
+            serviceDetailsDiv.style.display = 'block';
+        }
+
+        // Wait for DOM to fully load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                bookingDateInput.addEventListener('change', updateAvailableTimeSlots);
+                if (serviceSelect) {
+                    serviceSelect.addEventListener('change', updateServiceDetails);
+                }
+                updateAvailableTimeSlots();
+                updateServiceDetails();
+            });
+        } else {
+            bookingDateInput.addEventListener('change', updateAvailableTimeSlots);
+            if (serviceSelect) {
+                serviceSelect.addEventListener('change', updateServiceDetails);
+            }
+            updateAvailableTimeSlots();
+            updateServiceDetails();
+        }
+    </script>
+</body>
+</html>

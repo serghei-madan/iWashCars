@@ -1,0 +1,238 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ service.name }} - Service Details | iWashCars</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar bg-primary text-primary-content">
+        <div class="navbar-start">
+            <a href="{% url 'index' %}" class="btn btn-ghost text-xl font-bold">🚗 iWashCars</a>
+        </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="{% url 'index' %}" class="hover:bg-primary-focus">Home</a></li>
+                <li><a href="{% url 'booking' %}" class="hover:bg-primary-focus">Book Now</a></li>
+            </ul>
+        </div>
+        <div class="navbar-end">
+            <a href="{% url 'booking' %}" class="btn btn-secondary">Book This Service</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+        <div class="hero-content text-center">
+            <div class="max-w-4xl">
+                <div class="breadcrumbs text-sm mb-4 justify-center">
+                    <ul class="text-blue-100">
+                        <li><a href="{% url 'index' %}" class="hover:text-white">Home</a></li>
+                        <li>Service Details</li>
+                        <li>{{ service.name }}</li>
+                    </ul>
+                </div>
+                <h1 class="text-5xl font-bold mb-6">{{ service.name }}</h1>
+                <p class="text-xl text-blue-100 mb-6">{{ service.description }}</p>
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <div class="bg-white/10 rounded-lg px-6 py-3">
+                        <div class="text-sm text-blue-100">Price</div>
+                        <div class="text-2xl font-bold">${{ service.price }}</div>
+                    </div>
+                    <div class="bg-white/10 rounded-lg px-6 py-3">
+                        <div class="text-sm text-blue-100">Duration</div>
+                        <div class="text-2xl font-bold">{{ service.get_duration_display }}</div>
+                    </div>
+                    <div class="bg-white/10 rounded-lg px-6 py-3">
+                        <div class="text-sm text-blue-100">Service Tier</div>
+                        <div class="text-2xl font-bold capitalize">{{ service.get_tier_display }}</div>
+                    </div>
+                </div>
+                <a href="{% url 'booking' %}" class="btn btn-accent btn-lg">📅 Book This Service Now</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Images Gallery -->
+    {% if service.images.all %}
+    <div class="container mx-auto px-4 py-16">
+        <h2 class="text-3xl font-bold text-center mb-8">Service Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for image in service.images.all %}
+            <div class="card bg-base-100 shadow-xl">
+                <figure class="aspect-video">
+                    <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:service.name }}"
+                         class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                         onclick="document.getElementById('modal-{{ image.id }}').showModal()">
+                </figure>
+                {% if image.alt_text %}
+                <div class="card-body p-4">
+                    <p class="text-sm text-gray-600">{{ image.alt_text }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Modal for full-size image -->
+            <dialog id="modal-{{ image.id }}" class="modal">
+                <div class="modal-box max-w-4xl">
+                    <form method="dialog">
+                        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+                    <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:service.name }}" class="w-full rounded-lg">
+                    {% if image.alt_text %}
+                    <p class="mt-4 text-center text-gray-600">{{ image.alt_text }}</p>
+                    {% endif %}
+                </div>
+                <form method="dialog" class="modal-backdrop">
+                    <button>close</button>
+                </form>
+            </dialog>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Service Details Content -->
+    <div class="container mx-auto px-4 py-16">
+        <div class="grid lg:grid-cols-2 gap-16">
+            <!-- What's Included -->
+            <div>
+                <h2 class="text-3xl font-bold mb-8">What's Included</h2>
+                {% if service.features %}
+                <ul class="space-y-4">
+                    {% for feature in service.features %}
+                    <li class="flex items-start">
+                        <div class="text-green-500 mr-4 mt-1 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <span class="text-gray-700 text-lg">{{ feature }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="bg-base-200 rounded-lg p-6">
+                    <p class="text-gray-600">Feature list coming soon! This comprehensive service includes everything needed to make your car look amazing.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Service Process -->
+            <div>
+                <h2 class="text-3xl font-bold mb-8">Our Process</h2>
+                {% if service.details %}
+                <div class="prose prose-lg max-w-none">
+                    <div class="bg-base-100 rounded-lg p-6 shadow-md">
+                        {{ service.details|linebreaks }}
+                    </div>
+                </div>
+                {% else %}
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="bg-primary text-primary-content w-10 h-10 rounded-full flex items-center justify-center font-bold mr-4 flex-shrink-0">1</div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Preparation</h4>
+                            <p class="text-gray-600">We prepare your vehicle and workspace for optimal cleaning results.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-primary text-primary-content w-10 h-10 rounded-full flex items-center justify-center font-bold mr-4 flex-shrink-0">2</div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Professional Service</h4>
+                            <p class="text-gray-600">Our experienced team performs the {{ service.name|lower }} service with attention to detail.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-primary text-primary-content w-10 h-10 rounded-full flex items-center justify-center font-bold mr-4 flex-shrink-0">3</div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Quality Inspection</h4>
+                            <p class="text-gray-600">We inspect our work to ensure it meets our high standards before completion.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-primary text-primary-content w-10 h-10 rounded-full flex items-center justify-center font-bold mr-4 flex-shrink-0">4</div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Final Touches</h4>
+                            <p class="text-gray-600">We add the finishing touches to make your vehicle shine.</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Choose Us -->
+    <div class="bg-base-200 py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Why Choose iWashCars?</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="text-4xl mb-4">🏆</div>
+                    <h3 class="text-xl font-bold mb-2">Professional Quality</h3>
+                    <p class="text-gray-600">Our trained professionals use only the best products and techniques.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl mb-4">⏰</div>
+                    <h3 class="text-xl font-bold mb-2">Convenient Scheduling</h3>
+                    <p class="text-gray-600">Easy online booking with flexible time slots to fit your schedule.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl mb-4">💯</div>
+                    <h3 class="text-xl font-bold mb-2">Satisfaction Guaranteed</h3>
+                    <p class="text-gray-600">We're not happy until you're completely satisfied with our service.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="bg-primary text-primary-content py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold mb-6">Ready to Give Your Car the Care It Deserves?</h2>
+            <p class="text-xl mb-8 text-primary-content/90">
+                Book your {{ service.name|lower }} service today and experience the difference professional care makes.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'booking' %}" class="btn btn-accent btn-lg">
+                    📅 Book {{ service.name }} - ${{ service.price }}
+                </a>
+                <a href="{% url 'index' %}" class="btn btn-outline btn-accent btn-lg">
+                    🏠 Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content">
+        <aside>
+            <p class="font-bold text-xl">🚗 iWashCars</p>
+            <p>Professional car wash and detailing services</p>
+            <p>Copyright © 2024 - All rights reserved</p>
+        </aside>
+    </footer>
+
+    <script>
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

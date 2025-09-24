@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed - iWashCars</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar bg-primary text-primary-content">
+        <div class="navbar-start">
+            <a href="{% url 'index' %}" class="btn btn-ghost text-xl font-bold">🚗 iWashCars</a>
+        </div>
+        <div class="navbar-end">
+            <a href="{% url 'index' %}" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div class="hero min-h-screen bg-gradient-to-r from-green-500 to-green-700">
+        <div class="hero-content text-center text-white">
+            <div class="max-w-md">
+                <div class="text-8xl mb-8">✅</div>
+                <h1 class="text-5xl font-bold mb-5">Booking Confirmed!</h1>
+                <p class="text-xl mb-8">Thank you for choosing iWashCars. Your appointment has been successfully booked.</p>
+
+                <div class="card bg-white text-black shadow-xl mb-8">
+                    <div class="card-body">
+                        <h2 class="card-title text-2xl justify-center mb-4">Booking Details</h2>
+
+                        <div class="text-left space-y-2">
+                            <p><strong>Name:</strong> {{ booking.first_name }} {{ booking.last_name }}</p>
+                            <p><strong>Email:</strong> {{ booking.email }}</p>
+                            {% if booking.phone %}
+                            <p><strong>Phone:</strong> {{ booking.phone }}</p>
+                            {% endif %}
+                            <p><strong>Service:</strong> {{ booking.get_service_type_display }}</p>
+                            <p><strong>Date:</strong> {{ booking.booking_date|date:"F d, Y" }}</p>
+                            <p><strong>Time:</strong> {{ booking.booking_time|time:"g:i A" }}</p>
+                            <p><strong>Location:</strong><br>
+                                {{ booking.address }}<br>
+                                {{ booking.city }}, {{ booking.zip_code }}
+                            </p>
+                            <p><strong>Booking ID:</strong> #{{ booking.id }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-lg">📧 A confirmation email has been sent to {{ booking.email }}</p>
+                    <p class="text-lg">📱 We'll call you 24 hours before your appointment to confirm</p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                    <a href="{% url 'index' %}" class="btn btn-primary btn-lg">Back to Home</a>
+                    <a href="{% url 'booking' %}" class="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-green-700">Book Another</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Important Information -->
+    <div class="py-16 bg-base-100">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-8">Important Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="card bg-base-200 shadow-lg">
+                    <div class="card-body text-center">
+                        <div class="text-4xl mb-4">🕐</div>
+                        <h3 class="card-title justify-center">Arrival Time</h3>
+                        <p>Our team will arrive within 15 minutes of your scheduled time</p>
+                    </div>
+                </div>
+                <div class="card bg-base-200 shadow-lg">
+                    <div class="card-body text-center">
+                        <div class="text-4xl mb-4">🚗</div>
+                        <h3 class="card-title justify-center">Preparation</h3>
+                        <p>Please ensure your vehicle is accessible and remove any valuable items</p>
+                    </div>
+                </div>
+                <div class="card bg-base-200 shadow-lg">
+                    <div class="card-body text-center">
+                        <div class="text-4xl mb-4">💳</div>
+                        <h3 class="card-title justify-center">Payment</h3>
+                        <p>Payment is due upon completion. We accept cash, card, and digital payments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
