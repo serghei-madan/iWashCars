@@ -41,6 +41,16 @@ class Service(models.Model):
         end_datetime = start_datetime + timedelta(minutes=self.duration_minutes)
         return end_datetime.time()
 
+    def get_deposit_amount(self):
+        """Get the deposit amount ($25 in cents)"""
+        from django.conf import settings
+        return settings.STRIPE_DEPOSIT_AMOUNT
+
+    def get_remaining_amount(self):
+        """Get the remaining amount after deposit (in cents)"""
+        total_cents = int(self.price * 100)
+        return total_cents - self.get_deposit_amount()
+
 
 class ServiceImage(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='images')
@@ -112,3 +122,65 @@ class Booking(models.Model):
             (self.booking_time <= other_booking.booking_time < self.booking_end_time) or
             (other_booking.booking_time <= self.booking_time < other_booking.booking_end_time)
         )
+
+
+class Payment(models.Model):
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('deposit_captured', 'Deposit Captured'),
+        ('fully_captured', 'Fully Captured'),
+        ('deposit_refunded', 'Deposit Refunded'),
+        ('cancelled', 'Cancelled'),
+        ('failed', 'Failed'),
+    ]
+
+    booking = models.OneToOneField(Booking, on_delete=models.CASCADE, related_name='payment')
+    stripe_payment_intent_id = models.CharField(max_length=200, unique=True)
+    stripe_customer_id = models.CharField(max_length=200, null=True, blank=True)
+
+    # Amounts in cents
+    deposit_amount = models.IntegerField(default=2500)  # $25.00 in cents
+    total_amount = models.IntegerField()  # Total service price in cents
+    remaining_amount = models.IntegerField()  # Amount remaining after deposit
+
+    status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deposit_captured_at = models.DateTimeField(null=True, blank=True)
+    fully_captured_at = models.DateTimeField(null=True, blank=True)
+    refunded_at = models.DateTimeField(null=True, blank=True)
+
+    # Additional metadata
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Payment for {self.booking} - {self.get_status_display()}"
+
+    def get_total_amount_dollars(self):
+        """Convert total amount from cents to dollars"""
+        return self.total_amount / 100
+
+    def get_deposit_amount_dollars(self):
+        """Convert deposit amount from cents to dollars"""
+        return self.deposit_amount / 100
+
+    def get_remaining_amount_dollars(self):
+        """Convert remaining amount from cents to dollars"""
+        return self.remaining_amount / 100
+
+    def can_capture_remaining(self):
+        """Check if remaining amount can be captured"""
+        return self.status == 'deposit_captured'
+
+    def can_refund_deposit(self):
+        """Check if deposit can be refunded"""
+        return self.status in ['deposit_captured', 'fully_captured']
+
+    def can_cancel_authorization(self):
+        """Check if authorization can be cancelled"""
+        return self.status == 'deposit_captured'

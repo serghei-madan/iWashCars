@@ -7,6 +7,7 @@
     <title>Book Your Car Wash - iWashCars</title>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
 </head>
 <body>
@@ -208,10 +209,31 @@
 
                         <div class="divider"></div>
 
+                        <!-- Payment Information -->
+                        <div class="bg-info/10 p-6 rounded-lg mb-6">
+                            <h3 class="text-xl font-bold mb-4 text-center">💳 Payment Information</h3>
+                            <div class="text-center mb-4">
+                                <p class="text-lg">
+                                    <span class="font-semibold text-primary">Deposit Required: $25.00</span>
+                                </p>
+                                <p class="text-sm text-gray-600">
+                                    We'll charge a $25 deposit now and collect the remaining amount after service completion.
+                                </p>
+                            </div>
+
+                            <!-- Stripe Elements will be inserted here -->
+                            <div id="payment-element" class="mb-4" style="display: none;">
+                                <!-- Stripe Elements will create form elements here -->
+                            </div>
+
+                            <div id="payment-messages" role="alert" style="display: none;" class="alert mb-4"></div>
+                        </div>
+
                         <div class="flex justify-center">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                📅 Book My Car Wash
+                            <button type="submit" id="submit-booking" class="btn btn-primary btn-lg">
+                                📅 Book My Car Wash & Pay Deposit
                             </button>
+                            <div id="payment-spinner" class="loading loading-spinner loading-lg text-primary ml-4" style="display: none;"></div>
                         </div>
                     </form>
                 </div>
@@ -220,6 +242,11 @@
     </div>
 
     <script>
+        // Stripe configuration
+        const stripe = Stripe('{{ stripe_publishable_key }}');
+        const depositAmount = {{ deposit_amount }};
+
+        // Form data
         const unavailableSlots = {{ unavailable_slots|safe }};
         const serviceData = {{ service_data|safe }};
         const bookingDateInput = document.getElementById('booking-date');
@@ -228,6 +255,12 @@
         const serviceSelect = document.getElementById('service-select');
         const serviceDetailsDiv = document.getElementById('service-details');
         const serviceInfoDiv = document.getElementById('service-info');
+
+        // Payment elements
+        let elements;
+        let paymentElement;
+        let clientSecret;
+        let bookingId;
 
         // Set minimum date to today
         const today = new Date().toISOString().split('T')[0];
@@ -319,6 +352,166 @@
             serviceDetailsDiv.style.display = 'block';
         }
 
+        // Initialize Stripe payment elements
+        async function initializeStripeElements() {
+            if (!bookingId || !clientSecret) return;
+
+            const appearance = {
+                theme: 'stripe',
+                variables: {
+                    colorPrimary: '#0066cc',
+                    colorBackground: '#ffffff',
+                    colorText: '#1f2937',
+                    colorDanger: '#df1b41',
+                    fontFamily: 'system-ui, sans-serif',
+                }
+            };
+
+            elements = stripe.elements({ appearance, clientSecret });
+
+            paymentElement = elements.create("payment");
+            paymentElement.mount("#payment-element");
+
+            document.getElementById('payment-element').style.display = 'block';
+        }
+
+        // Create booking and payment intent
+        async function createBookingWithPayment(formData) {
+            try {
+                // First create the booking
+                const bookingResponse = await fetch(window.location.pathname, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    }
+                });
+
+                if (!bookingResponse.ok) {
+                    // If booking creation failed, show the form errors
+                    const html = await bookingResponse.text();
+                    document.body.innerHTML = html;
+                    return false;
+                }
+
+                // Parse the response to get booking ID (assuming redirect to success page)
+                const responseUrl = bookingResponse.url;
+                const urlMatch = responseUrl.match(/booking\/success\/(\d+)\//);
+                if (urlMatch) {
+                    bookingId = urlMatch[1];
+                } else {
+                    throw new Error('Could not extract booking ID from response');
+                }
+
+                // Now create payment intent
+                const paymentResponse = await fetch('/api/create-payment-intent/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                    body: JSON.stringify({
+                        booking_id: bookingId
+                    })
+                });
+
+                const paymentData = await paymentResponse.json();
+                if (!paymentResponse.ok) {
+                    throw new Error(paymentData.error || 'Failed to create payment intent');
+                }
+
+                clientSecret = paymentData.clientSecret;
+                await initializeStripeElements();
+
+                return true;
+            } catch (error) {
+                showPaymentMessage(error.message, 'error');
+                return false;
+            }
+        }
+
+        // Handle form submission
+        async function handleSubmit(event) {
+            event.preventDefault();
+
+            const submitButton = document.getElementById('submit-booking');
+            const spinner = document.getElementById('payment-spinner');
+
+            // Show loading state
+            submitButton.disabled = true;
+            spinner.style.display = 'block';
+
+            try {
+                const form = event.target;
+                const formData = new FormData(form);
+
+                // Step 1: Create booking and payment intent
+                if (!clientSecret) {
+                    const success = await createBookingWithPayment(formData);
+                    if (!success) {
+                        submitButton.disabled = false;
+                        spinner.style.display = 'none';
+                        return;
+                    }
+                }
+
+                // Step 2: Confirm payment with Stripe
+                const { error } = await stripe.confirmPayment({
+                    elements,
+                    confirmParams: {
+                        return_url: `${window.location.origin}/booking/success/${bookingId}/`,
+                    },
+                    redirect: 'if_required'
+                });
+
+                if (error) {
+                    showPaymentMessage(error.message, 'error');
+                } else {
+                    // Payment succeeded, confirm with backend
+                    const confirmResponse = await fetch('/api/confirm-payment/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        },
+                        body: JSON.stringify({
+                            payment_intent_id: clientSecret.split('_secret_')[0]
+                        })
+                    });
+
+                    const confirmData = await confirmResponse.json();
+                    if (confirmResponse.ok) {
+                        showPaymentMessage('Payment successful! Redirecting...', 'success');
+                        setTimeout(() => {
+                            window.location.href = `/booking/success/${bookingId}/`;
+                        }, 2000);
+                    } else {
+                        showPaymentMessage(confirmData.error || 'Payment confirmation failed', 'error');
+                    }
+                }
+            } catch (error) {
+                showPaymentMessage(error.message, 'error');
+            } finally {
+                submitButton.disabled = false;
+                spinner.style.display = 'none';
+            }
+        }
+
+        // Show payment messages
+        function showPaymentMessage(message, type = 'info') {
+            const messagesDiv = document.getElementById('payment-messages');
+            messagesDiv.style.display = 'block';
+            messagesDiv.className = `alert alert-${type === 'error' ? 'error' : type === 'success' ? 'success' : 'info'}`;
+            messagesDiv.textContent = message;
+
+            // Auto-hide non-error messages
+            if (type !== 'error') {
+                setTimeout(() => {
+                    messagesDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
         // Wait for DOM to fully load
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
@@ -326,6 +519,7 @@
                 if (serviceSelect) {
                     serviceSelect.addEventListener('change', updateServiceDetails);
                 }
+                document.getElementById('booking-form').addEventListener('submit', handleSubmit);
                 updateAvailableTimeSlots();
                 updateServiceDetails();
             });
@@ -334,6 +528,7 @@
             if (serviceSelect) {
                 serviceSelect.addEventListener('change', updateServiceDetails);
             }
+            document.getElementById('booking-form').addEventListener('submit', handleSubmit);
             updateAvailableTimeSlots();
             updateServiceDetails();
         }
