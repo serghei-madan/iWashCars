@@ -6,3 +6,4 @@ typing-extensions==4.15.0
 Pillow==10.0.0
 stripe==8.0.0
 python-dotenv==1.0.0
+twilio==9.0.0

@@ -97,6 +97,8 @@ class Booking(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_confirmed = models.BooleanField(default=False)
     total_price = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    reminder_sent = models.BooleanField(default=False)
+    reminder_sent_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['booking_date', 'booking_time']

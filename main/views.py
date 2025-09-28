@@ -7,6 +7,7 @@ from django.conf import settings
 from .forms import BookingForm
 from .models import Booking, Service, Payment
 from .stripe_utils import StripePaymentService
+from .notification_utils import NotificationService
 import json
 from datetime import datetime, timedelta
 
@@ -123,14 +124,16 @@ def confirm_payment(request):
         result = StripePaymentService.capture_deposit(payment)
 
         if result['success']:
-            # Update booking confirmation
             payment.booking.is_confirmed = True
             payment.booking.save()
+
+            notification_results = NotificationService.send_all_booking_notifications(payment.booking)
 
             return JsonResponse({
                 'success': True,
                 'message': result['message'],
-                'booking_id': payment.booking.id
+                'booking_id': payment.booking.id,
+                'notifications': notification_results
             })
         else:
             return JsonResponse({'error': result['error']}, status=400)

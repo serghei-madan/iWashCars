@@ -1,6 +1,9 @@
 from django import forms
+from django.core.validators import EmailValidator, RegexValidator
+from django.core.exceptions import ValidationError
 from .models import Booking, Service
 from datetime import datetime, timedelta, time
+import re
 
 class BookingForm(forms.ModelForm):
     booking_time = forms.ChoiceField(
@@ -27,7 +30,6 @@ class BookingForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Limit services to active ones only
         self.fields['service'].queryset = Service.objects.filter(is_active=True)
 
         time_choices = [('', 'Select a time')]
@@ -44,3 +46,31 @@ class BookingForm(forms.ModelForm):
             current_time += timedelta(minutes=30)
 
         self.fields['booking_time'].choices = time_choices
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            email = email.strip().lower()
+            email_validator = EmailValidator(message="Enter a valid email address.")
+            try:
+                email_validator(email)
+            except ValidationError:
+                raise ValidationError("Please enter a valid email address (e.g., user@example.com).")
+
+            if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+                raise ValidationError("Please enter a valid email address (e.g., user@example.com).")
+
+        return email
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        if phone:
+            phone = re.sub(r'[^\d+]', '', phone)
+
+            if not re.match(r'^\+?1?\d{10,15}$', phone):
+                raise ValidationError("Please enter a valid phone number with 10-15 digits (e.g., +1234567890 or 1234567890).")
+
+            if len(phone) < 10:
+                raise ValidationError("Phone number must be at least 10 digits.")
+
+        return phone
