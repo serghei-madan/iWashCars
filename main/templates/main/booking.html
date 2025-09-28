@@ -275,6 +275,9 @@
 
             const unavailableForDate = unavailableSlots[selectedDate] || [];
             const allOptions = Array.from(bookingTimeSelect.options);
+            const isToday = selectedDate === today;
+            const now = new Date();
+            const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
 
             console.log('Selected date:', selectedDate);
             console.log('All options count:', allOptions.length);
@@ -284,9 +287,12 @@
             let unavailableCount = 0;
 
             allOptions.forEach(option => {
-                // Skip the empty "Select a time" option
                 if (option.value && option.value !== '') {
-                    if (unavailableForDate.includes(option.value)) {
+                    const [hours, minutes] = option.value.split(':').map(Number);
+                    const slotTimeMinutes = hours * 60 + minutes;
+                    const isPastTime = isToday && slotTimeMinutes <= currentTimeMinutes;
+
+                    if (unavailableForDate.includes(option.value) || isPastTime) {
                         option.disabled = true;
                         option.style.color = '#999';
                         unavailableCount++;
@@ -305,7 +311,6 @@
                 timeSlotsDiv.innerHTML = '<span class="text-error">❌ All slots are booked for this date</span>';
             } else if (availableSlots.length === 0) {
                 timeSlotsDiv.innerHTML = '<span class="text-warning">⏳ Loading time slots...</span>';
-                // If no slots loaded yet, wait a bit and try again
                 setTimeout(updateAvailableTimeSlots, 500);
             } else {
                 timeSlotsDiv.innerHTML = `

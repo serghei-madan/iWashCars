@@ -30,10 +30,9 @@ class BookingForm(forms.ModelForm):
         # Limit services to active ones only
         self.fields['service'].queryset = Service.objects.filter(is_active=True)
 
-        # Generate time slots from 8 AM to 6 PM every 30 minutes
         time_choices = [('', 'Select a time')]
-        start_time = time(8, 0)  # 8:00 AM
-        end_time = time(18, 0)   # 6:00 PM
+        start_time = time(8, 0)
+        end_time = time(18, 0)
 
         current_time = datetime.combine(datetime.today(), start_time)
         end_datetime = datetime.combine(datetime.today(), end_time)
