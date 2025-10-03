@@ -26,8 +26,10 @@ def booking(request):
     else:
         form = BookingForm()
 
-    # Get existing bookings with their end times
-    existing_bookings = Booking.objects.select_related('service').values(
+    # Get existing bookings with their end times (exclude cancelled bookings)
+    existing_bookings = Booking.objects.select_related('service').exclude(
+        status='cancelled'
+    ).values(
         'booking_date', 'booking_time', 'booking_end_time', 'service__duration_minutes'
     )
 
@@ -125,6 +127,7 @@ def confirm_payment(request):
 
         if result['success']:
             payment.booking.is_confirmed = True
+            payment.booking.status = 'confirmed'
             payment.booking.save()
 
             notification_results = NotificationService.send_all_booking_notifications(payment.booking)

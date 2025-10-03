@@ -269,6 +269,52 @@ class NotificationService:
             return {'success': False, 'error': str(e)}
 
     @staticmethod
+    def send_cancellation_notification(booking):
+        """
+        Send cancellation notification email to customer
+        """
+        try:
+            # Check if there's a payment and its status
+            has_payment = False
+            payment_refunded = False
+            payment_cancelled = False
+
+            try:
+                payment = booking.payment
+                has_payment = True
+                payment_refunded = payment.status == 'deposit_refunded'
+                payment_cancelled = payment.status == 'cancelled'
+            except:
+                pass
+
+            context = {
+                'booking': booking,
+                'has_payment': has_payment,
+                'payment_refunded': payment_refunded,
+                'payment_cancelled': payment_cancelled,
+            }
+
+            html_message = render_to_string(
+                'main/emails/booking_cancellation.html',
+                context
+            )
+            plain_message = strip_tags(html_message)
+
+            send_mail(
+                subject=f'Booking Cancellation - iWashCars #{booking.id}',
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[booking.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+
+            return {'success': True, 'message': 'Cancellation notification sent'}
+
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @staticmethod
     def send_all_booking_notifications(booking):
         results = {
             'customer_email': NotificationService.send_customer_booking_confirmation(booking),

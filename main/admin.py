@@ -32,11 +32,47 @@ class ServiceAdmin(admin.ModelAdmin):
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'service', 'booking_date', 'booking_time', 'booking_end_time', 'is_confirmed', 'payment_status']
-    list_filter = ['booking_date', 'service', 'is_confirmed']
+    list_display = ['__str__', 'service', 'booking_date', 'booking_time', 'booking_end_time', 'status_badge', 'is_confirmed', 'payment_status']
+    list_filter = ['booking_date', 'service', 'status', 'is_confirmed']
     search_fields = ['first_name', 'last_name', 'email', 'phone']
     date_hierarchy = 'booking_date'
-    readonly_fields = ['booking_end_time', 'total_price', 'created_at', 'updated_at']
+    readonly_fields = ['booking_end_time', 'total_price', 'created_at', 'updated_at', 'cancelled_at']
+    actions = ['cancel_booking', 'mark_completed', 'mark_no_show']
+
+    fieldsets = (
+        ('Customer Information', {
+            'fields': ('first_name', 'last_name', 'email', 'phone')
+        }),
+        ('Service Details', {
+            'fields': ('service', 'booking_date', 'booking_time', 'booking_end_time', 'total_price')
+        }),
+        ('Location', {
+            'fields': ('address', 'city', 'zip_code')
+        }),
+        ('Status', {
+            'fields': ('status', 'is_confirmed', 'cancellation_reason', 'cancelled_at')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at', 'reminder_sent', 'reminder_sent_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def status_badge(self, obj):
+        status_colors = {
+            'pending': '#FFA500',  # orange
+            'confirmed': '#007BFF', # blue
+            'completed': '#28A745', # green
+            'cancelled': '#DC3545', # red
+            'no_show': '#6C757D',   # gray
+        }
+        color = status_colors.get(obj.status, '#000000')
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 3px 10px; border-radius: 3px; font-weight: bold;">{}</span>',
+            color,
+            obj.get_status_display()
+        )
+    status_badge.short_description = 'Status'
 
     def payment_status(self, obj):
         try:
@@ -59,6 +95,99 @@ class BookingAdmin(admin.ModelAdmin):
             return format_html('<span style="color: red;">No Payment</span>')
 
     payment_status.short_description = 'Payment Status'
+
+    def cancel_booking(self, request, queryset):
+        """Cancel selected bookings and handle payments"""
+        from .notification_utils import NotificationService
+
+        successful = 0
+        failed = 0
+
+        for booking in queryset:
+            if booking.status == 'cancelled':
+                self.message_user(request, f"⚠️  {booking}: Already cancelled", level='WARNING')
+                continue
+
+            try:
+                # Cancel/refund payment if exists
+                payment_result = None
+                try:
+                    payment = booking.payment
+                    if payment.status == 'deposit_captured':
+                        # Cancel authorization and release held funds
+                        payment_result = StripePaymentService.cancel_authorization(payment)
+                        if not payment_result['success']:
+                            # If can't cancel auth, try refund
+                            if payment.can_refund_deposit():
+                                payment_result = StripePaymentService.refund_deposit(
+                                    payment,
+                                    reason="Booking cancelled by admin"
+                                )
+                    elif payment.can_refund_deposit():
+                        # Refund deposit if possible
+                        payment_result = StripePaymentService.refund_deposit(
+                            payment,
+                            reason="Booking cancelled by admin"
+                        )
+                except Payment.DoesNotExist:
+                    pass  # No payment to handle
+
+                # Update booking status
+                booking.status = 'cancelled'
+                booking.cancelled_at = timezone.now()
+                booking.cancellation_reason = 'Cancelled by admin'
+                booking.save()
+
+                # Send cancellation email
+                try:
+                    email_result = NotificationService.send_cancellation_notification(booking)
+                    if not email_result['success']:
+                        self.message_user(
+                            request,
+                            f"⚠️  {booking}: Cancelled but email failed: {email_result.get('error')}",
+                            level='WARNING'
+                        )
+                except Exception as e:
+                    self.message_user(
+                        request,
+                        f"⚠️  {booking}: Cancelled but email failed: {str(e)}",
+                        level='WARNING'
+                    )
+
+                successful += 1
+                payment_msg = ""
+                if payment_result:
+                    payment_msg = f" (Payment: {payment_result.get('message', 'handled')})"
+                self.message_user(request, f"✅ {booking}: Cancelled successfully{payment_msg}")
+
+            except Exception as e:
+                failed += 1
+                self.message_user(request, f"❌ {booking}: Failed to cancel - {str(e)}", level='ERROR')
+
+        if successful:
+            self.message_user(request, f"Successfully cancelled {successful} booking(s)")
+        if failed:
+            self.message_user(request, f"Failed to cancel {failed} booking(s)", level='WARNING')
+
+    cancel_booking.short_description = "Cancel selected bookings (refund/release payment)"
+
+    def mark_completed(self, request, queryset):
+        """Mark bookings as completed"""
+        updated = queryset.filter(status__in=['pending', 'confirmed']).update(
+            status='completed'
+        )
+        self.message_user(request, f"Marked {updated} booking(s) as completed")
+
+    mark_completed.short_description = "Mark as completed"
+
+    def mark_no_show(self, request, queryset):
+        """Mark bookings as no-show (keep deposit)"""
+        updated = queryset.filter(status__in=['pending', 'confirmed']).update(
+            status='no_show'
+        )
+        self.message_user(request, f"Marked {updated} booking(s) as no-show")
+
+    mark_no_show.short_description = "Mark as no-show (keep deposit)"
 
 @admin.register(ServiceImage)
 class ServiceImageAdmin(admin.ModelAdmin):
@@ -188,6 +317,8 @@ class PaymentAdmin(admin.ModelAdmin):
 
     def cancel_authorization(self, request, queryset):
         """Admin action to cancel authorization and release held funds"""
+        from .notification_utils import NotificationService
+
         successful = 0
         failed = 0
 
@@ -195,6 +326,24 @@ class PaymentAdmin(admin.ModelAdmin):
             if payment.can_cancel_authorization():
                 result = StripePaymentService.cancel_authorization(payment)
                 if result['success']:
+                    # Also mark booking as cancelled
+                    booking = payment.booking
+                    if booking.status not in ['cancelled', 'completed']:
+                        booking.status = 'cancelled'
+                        booking.cancelled_at = timezone.now()
+                        booking.cancellation_reason = 'Payment authorization cancelled by admin'
+                        booking.save()
+
+                        # Send cancellation notification
+                        try:
+                            NotificationService.send_cancellation_notification(booking)
+                        except Exception as e:
+                            self.message_user(
+                                request,
+                                f"⚠️ {payment.booking}: Payment cancelled but email failed: {str(e)}",
+                                level='WARNING'
+                            )
+
                     successful += 1
                     self.message_user(request, f"✅ {payment.booking}: {result['message']}")
                 else:
@@ -209,4 +358,4 @@ class PaymentAdmin(admin.ModelAdmin):
         if failed:
             self.message_user(request, f"Failed to process {failed} payment(s)", level='WARNING')
 
-    cancel_authorization.short_description = "Cancel authorization (release held funds)"
+    cancel_authorization.short_description = "Cancel authorization (release held funds & cancel booking)"

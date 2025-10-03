@@ -74,6 +74,14 @@ class ServiceImage(models.Model):
 
 
 class Booking(models.Model):
+    BOOKING_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+        ('no_show', 'No Show'),
+    ]
+
     # Customer information
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -96,9 +104,12 @@ class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_confirmed = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=BOOKING_STATUS_CHOICES, default='pending')
     total_price = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     reminder_sent = models.BooleanField(default=False)
     reminder_sent_at = models.DateTimeField(null=True, blank=True)
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    cancellation_reason = models.TextField(blank=True)
 
     class Meta:
         ordering = ['booking_date', 'booking_time']
