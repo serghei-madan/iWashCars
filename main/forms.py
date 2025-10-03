@@ -2,6 +2,7 @@ from django import forms
 from django.core.validators import EmailValidator, RegexValidator
 from django.core.exceptions import ValidationError
 from .models import Booking, Service
+from .address_validator import validate_service_area
 from datetime import datetime, timedelta, time
 import re
 
@@ -74,3 +75,28 @@ class BookingForm(forms.ModelForm):
                 raise ValidationError("Phone number must be at least 10 digits.")
 
         return phone
+
+    def clean(self):
+        """
+        Validate that the service address is within the service area (10 miles from 91602)
+        """
+        cleaned_data = super().clean()
+        address = cleaned_data.get('address')
+        city = cleaned_data.get('city')
+        zip_code = cleaned_data.get('zip_code')
+
+        # Only validate if we have all address components
+        if address and city and zip_code:
+            validation_result = validate_service_area(address, city, zip_code)
+
+            if not validation_result['valid']:
+                # Add error to the form
+                error_message = validation_result['message']
+                if validation_result['distance_miles']:
+                    error_message += f" (Distance: {validation_result['distance_miles']} miles)"
+
+                raise ValidationError({
+                    'address': error_message
+                })
+
+        return cleaned_data

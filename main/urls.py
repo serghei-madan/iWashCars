@@ -10,4 +10,6 @@ urlpatterns = [
     path('api/create-payment-intent/', views.create_payment_intent, name='create_payment_intent'),
     path('api/confirm-payment/', views.confirm_payment, name='confirm_payment'),
     path('stripe/webhook/', views.stripe_webhook, name='stripe_webhook'),
+    # Address validation endpoint
+    path('api/validate-address/', views.validate_address_api, name='validate_address_api'),
 ]

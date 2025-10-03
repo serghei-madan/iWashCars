@@ -105,6 +105,17 @@
 
                                 <h3 class="text-xl font-bold mb-4">Service Location</h3>
 
+                                <!-- Service Area Notice -->
+                                <!-- <div class="alert alert-info mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <div>
+                                        <h4 class="font-bold">Service Area</h4>
+                                        <p class="text-sm">We serve addresses within 15 miles of North Hollywood, CA (ZIP: 91602)</p>
+                                    </div>
+                                </div> -->
+
                                 <div class="form-control mb-4">
                                     <label class="label">
                                         <span class="label-text">Address *</span>
@@ -140,6 +151,11 @@
                                             </label>
                                         {% endif %}
                                     </div>
+                                </div>
+
+                                <!-- Real-time Address Validation Feedback -->
+                                <div id="address-validation-feedback" class="mt-4" style="display: none;">
+                                    <!-- Validation message will be inserted here -->
                                 </div>
                             </div>
 
@@ -265,6 +281,109 @@
         // Set minimum date to today
         const today = new Date().toISOString().split('T')[0];
         bookingDateInput.min = today;
+
+        // Real-time address validation
+        const addressInput = document.getElementById('{{ form.address.id_for_label }}');
+        const cityInput = document.getElementById('{{ form.city.id_for_label }}');
+        const zipInput = document.getElementById('{{ form.zip_code.id_for_label }}');
+        const validationFeedback = document.getElementById('address-validation-feedback');
+        let validationTimeout = null;
+
+        // Validate address on blur (when user finishes typing)
+        function validateAddress() {
+            const address = addressInput.value.trim();
+            const city = cityInput.value.trim();
+            const zipCode = zipInput.value.trim();
+
+            // Only validate if all fields are filled
+            if (!address || !city || !zipCode) {
+                validationFeedback.style.display = 'none';
+                return;
+            }
+
+            // Show loading state
+            validationFeedback.style.display = 'block';
+            validationFeedback.innerHTML = `
+                <div class="alert alert-info">
+                    <span class="loading loading-spinner loading-sm"></span>
+                    <span>Validating address...</span>
+                </div>
+            `;
+
+            // Make API call to validate address
+            fetch(`/api/validate-address/?address=${encodeURIComponent(address)}&city=${encodeURIComponent(city)}&zip_code=${encodeURIComponent(zipCode)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.valid === true) {
+                        // Address is valid
+                        validationFeedback.innerHTML = `
+                            <div class="alert alert-success">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div>
+                                    <div class="font-bold">✓ Address is within our service area</div>
+                                    <div class="text-sm">${data.message}</div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (data.valid === false) {
+                        // Address is outside service area
+                        validationFeedback.innerHTML = `
+                            <div class="alert alert-error">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div>
+                                    <div class="font-bold">⚠ Address is outside our service area</div>
+                                    <div class="text-sm">${data.message}</div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Validation couldn't be completed (but we'll allow submission)
+                        validationFeedback.innerHTML = `
+                            <div class="alert alert-warning">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <div>
+                                    <div class="text-sm">${data.message}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Validation error:', error);
+                    validationFeedback.innerHTML = `
+                        <div class="alert alert-warning">
+                            <span>Could not validate address at this time. You can still proceed with booking.</span>
+                        </div>
+                    `;
+                });
+        }
+
+        // Debounce validation - wait 1000ms after user stops typing
+        function debounceValidation() {
+            if (validationTimeout) {
+                clearTimeout(validationTimeout);
+            }
+            validationTimeout = setTimeout(validateAddress, 1000);
+        }
+
+        // Add event listeners for real-time validation
+        if (addressInput && cityInput && zipInput) {
+            // Validate on blur (when user leaves the field)
+            addressInput.addEventListener('blur', validateAddress);
+            cityInput.addEventListener('blur', validateAddress);
+            zipInput.addEventListener('blur', validateAddress);
+
+            // Also validate on input with debouncing
+            addressInput.addEventListener('input', debounceValidation);
+            cityInput.addEventListener('input', debounceValidation);
+            zipInput.addEventListener('input', debounceValidation);
+        }
 
         function updateAvailableTimeSlots() {
             const selectedDate = bookingDateInput.value;

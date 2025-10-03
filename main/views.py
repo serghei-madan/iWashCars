@@ -8,6 +8,7 @@ from .forms import BookingForm
 from .models import Booking, Service, Payment
 from .stripe_utils import StripePaymentService
 from .notification_utils import NotificationService
+from .address_validator import validate_service_area
 import json
 from datetime import datetime, timedelta
 
@@ -190,3 +191,30 @@ def stripe_webhook(request):
             pass
 
     return HttpResponse(status=200)
+
+
+def validate_address_api(request):
+    """API endpoint for real-time address validation"""
+    if request.method == 'GET':
+        address = request.GET.get('address', '').strip()
+        city = request.GET.get('city', '').strip()
+        zip_code = request.GET.get('zip_code', '').strip()
+
+        # Check if all fields are provided
+        if not all([address, city, zip_code]):
+            return JsonResponse({
+                'valid': None,
+                'message': 'Please fill in all address fields',
+                'distance_miles': None
+            })
+
+        # Validate service area
+        result = validate_service_area(address, city, zip_code)
+
+        return JsonResponse({
+            'valid': result['valid'],
+            'message': result['message'],
+            'distance_miles': result['distance_miles']
+        })
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
