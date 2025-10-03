@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_q',
     'main',
 ]
 
@@ -141,13 +142,21 @@ STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
 STRIPE_DEPOSIT_AMOUNT = int(os.getenv('STRIPE_DEPOSIT_AMOUNT', '2500'))  # $25.00 in cents
 
 # Email Settings
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+# Use Mailgun backend for production, console for development
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'main.mailgun_backend.MailgunEmailBackend')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@iwashcars.com')
+
+# Mailgun Configuration
+MAILGUN_API_KEY = os.getenv('MAILGUN_API_KEY', '')
+MAILGUN_SANDBOX_DOMAIN = os.getenv('MAILGUN_SANDBOX_DOMAIN', '')
+MAILGUN_BASE_URL = os.getenv('MAILGUN_BASE_URL', 'https://api.mailgun.net')
+
+# Legacy SMTP settings (kept for reference, not used with Mailgun backend)
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@iwashcars.com')
 
 # Business Settings
 DRIVER_NOTIFICATION_EMAIL = os.getenv('DRIVER_NOTIFICATION_EMAIL', 'driver@iwashcars.com')
@@ -157,3 +166,17 @@ DRIVER_NOTIFICATION_PHONE = os.getenv('DRIVER_NOTIFICATION_PHONE', '')
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', '')
 TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '')
 TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER', '')
+
+# Django-Q Configuration
+Q_CLUSTER = {
+    'name': 'iWashCars',
+    'workers': 2,
+    'recycle': 500,
+    'timeout': 60,
+    'compress': True,
+    'save_limit': 250,
+    'queue_limit': 500,
+    'cpu_affinity': 1,
+    'label': 'Django Q',
+    'orm': 'default',
+}

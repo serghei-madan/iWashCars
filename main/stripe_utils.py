@@ -2,6 +2,9 @@ import stripe
 from django.conf import settings
 from django.utils import timezone
 from .models import Payment, Booking
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Configure Stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -132,9 +135,19 @@ class StripePaymentService:
                 payment.fully_captured_at = timezone.now()
                 payment.save()
 
+                # Send service completion receipt email
+                try:
+                    from .notification_utils import NotificationService
+                    receipt_result = NotificationService.send_service_completion_receipt(payment)
+                    if receipt_result['success']:
+                        logger.info(f"Service completion receipt sent for payment #{payment.id}")
+                except Exception as e:
+                    logger.error(f"Error sending service completion receipt: {str(e)}")
+
                 return {
                     'success': True,
-                    'message': f'Payment already fully captured. Total amount: ${amount_received/100:.2f}'
+                    'message': f'Payment already fully captured. Total amount: ${amount_received/100:.2f}',
+                    'receipt_sent': receipt_result.get('success', False) if 'receipt_result' in locals() else False
                 }
 
             # Check what's already been captured
@@ -171,10 +184,22 @@ class StripePaymentService:
             payment.fully_captured_at = timezone.now()
             payment.save()
 
+            # Send service completion receipt email
+            try:
+                from .notification_utils import NotificationService
+                receipt_result = NotificationService.send_service_completion_receipt(payment)
+                if receipt_result['success']:
+                    logger.info(f"Service completion receipt sent for payment #{payment.id}")
+                else:
+                    logger.error(f"Failed to send receipt: {receipt_result.get('error')}")
+            except Exception as e:
+                logger.error(f"Error sending service completion receipt: {str(e)}")
+
             final_amount = getattr(captured_intent, 'amount_received', amount_capturable)
             return {
                 'success': True,
-                'message': f'Successfully captured ${amount_capturable/100:.2f}. Total captured: ${final_amount/100:.2f}'
+                'message': f'Successfully captured ${amount_capturable/100:.2f}. Total captured: ${final_amount/100:.2f}',
+                'receipt_sent': receipt_result.get('success', False) if 'receipt_result' in locals() else False
             }
 
         except stripe.error.InvalidRequestError as e:
@@ -236,10 +261,22 @@ class StripePaymentService:
             payment.notes = f'Deposit refunded: {reason}'
             payment.save()
 
+            # Send refund receipt email
+            try:
+                from .notification_utils import NotificationService
+                receipt_result = NotificationService.send_refund_receipt(payment)
+                if receipt_result['success']:
+                    logger.info(f"Refund receipt sent for payment #{payment.id}")
+                else:
+                    logger.error(f"Failed to send refund receipt: {receipt_result.get('error')}")
+            except Exception as e:
+                logger.error(f"Error sending refund receipt: {str(e)}")
+
             return {
                 'success': True,
                 'message': f'Deposit of ${payment.get_deposit_amount_dollars():.2f} refunded successfully',
-                'refund_id': refund.id
+                'refund_id': refund.id,
+                'receipt_sent': receipt_result.get('success', False) if 'receipt_result' in locals() else False
             }
 
         except stripe.error.StripeError as e:

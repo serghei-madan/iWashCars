@@ -176,6 +176,99 @@ class NotificationService:
             return {'success': False, 'error': str(e)}
 
     @staticmethod
+    def send_reminder_email(booking):
+        try:
+            context = {
+                'booking': booking,
+            }
+
+            html_message = render_to_string(
+                'main/emails/customer_booking_reminder.html',
+                context
+            )
+            plain_message = strip_tags(html_message)
+
+            send_mail(
+                subject=f'Reminder: Your iWashCars appointment is in 30 minutes!',
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[booking.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+
+            return {'success': True, 'message': 'Reminder email sent'}
+
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @staticmethod
+    def send_service_completion_receipt(payment):
+        """
+        Send receipt email after service completion and full payment capture
+        """
+        try:
+            booking = payment.booking
+
+            context = {
+                'booking': booking,
+                'payment': payment,
+            }
+
+            html_message = render_to_string(
+                'main/emails/service_completion_receipt.html',
+                context
+            )
+            plain_message = strip_tags(html_message)
+
+            send_mail(
+                subject=f'Service Completion Receipt - iWashCars #{booking.id}',
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[booking.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+
+            return {'success': True, 'message': 'Service completion receipt sent'}
+
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @staticmethod
+    def send_refund_receipt(payment):
+        """
+        Send receipt email after refund is processed
+        """
+        try:
+            booking = payment.booking
+
+            context = {
+                'booking': booking,
+                'payment': payment,
+            }
+
+            html_message = render_to_string(
+                'main/emails/refund_receipt.html',
+                context
+            )
+            plain_message = strip_tags(html_message)
+
+            send_mail(
+                subject=f'Refund Receipt - iWashCars #{booking.id}',
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[booking.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+
+            return {'success': True, 'message': 'Refund receipt sent'}
+
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @staticmethod
     def send_all_booking_notifications(booking):
         results = {
             'customer_email': NotificationService.send_customer_booking_confirmation(booking),

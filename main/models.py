@@ -126,6 +126,20 @@ class Booking(models.Model):
         )
 
 
+class TermsAndConditionsAcceptance(models.Model):
+    booking = models.OneToOneField(Booking, on_delete=models.CASCADE, related_name='terms_acceptance')
+    accepted_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = "Terms & Conditions Acceptance"
+        verbose_name_plural = "Terms & Conditions Acceptances"
+
+    def __str__(self):
+        return f"T&C accepted by {self.booking.email} at {self.accepted_at}"
+
+
 class Payment(models.Model):
     PAYMENT_STATUS_CHOICES = [
         ('pending', 'Pending'),
