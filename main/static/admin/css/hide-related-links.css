@@ -1,0 +1,4 @@
+/* Hide the "add another" and "change" links next to vehicle_type field */
+.field-vehicle_type .related-widget-wrapper-link {
+    display: none !important;
+}

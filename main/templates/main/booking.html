@@ -165,6 +165,21 @@
 
                                 <div class="form-control mb-6">
                                     <label class="label">
+                                        <span class="label-text">Vehicle Type *</span>
+                                    </label>
+                                    {{ form.vehicle_type }}
+                                    {% if form.vehicle_type.errors %}
+                                        <label class="label">
+                                            <span class="label-text-alt text-error">{{ form.vehicle_type.errors.0 }}</span>
+                                        </label>
+                                    {% endif %}
+                                    <label class="label">
+                                        <span class="label-text-alt">SUV/Large vehicles have a $50 surcharge</span>
+                                    </label>
+                                </div>
+
+                                <div class="form-control mb-6">
+                                    <label class="label">
                                         <span class="label-text">Service Type *</span>
                                     </label>
                                     {{ form.service }}
@@ -268,6 +283,7 @@
         const bookingDateInput = document.getElementById('booking-date');
         const bookingTimeSelect = document.getElementById('booking-time');
         const timeSlotsDiv = document.getElementById('time-slots');
+        const vehicleTypeSelect = document.getElementById('vehicle-type-select');
         const serviceSelect = document.getElementById('service-select');
         const serviceDetailsDiv = document.getElementById('service-details');
         const serviceInfoDiv = document.getElementById('service-info');
@@ -437,6 +453,26 @@
                     ${unavailableCount > 0 ? `<br><span class="text-warning">⚠️ ${unavailableCount} slots already booked</span>` : ''}
                 `;
             }
+        }
+
+        function updateServiceOptions() {
+            const selectedVehicleTypeId = vehicleTypeSelect.value;
+
+            // Clear current service options
+            serviceSelect.innerHTML = '<option value="">Select a service</option>';
+
+            // Filter services by vehicle type ID and add to select
+            Object.entries(serviceData).forEach(([id, service]) => {
+                if (String(service.vehicle_type_id) === String(selectedVehicleTypeId)) {
+                    const option = document.createElement('option');
+                    option.value = id;
+                    option.textContent = `${service.name} - $${service.price}`;
+                    serviceSelect.appendChild(option);
+                }
+            });
+
+            // Clear service details when vehicle type changes
+            serviceDetailsDiv.style.display = 'none';
         }
 
         function updateServiceDetails() {
@@ -640,21 +676,27 @@
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
                 bookingDateInput.addEventListener('change', updateAvailableTimeSlots);
+                if (vehicleTypeSelect) {
+                    vehicleTypeSelect.addEventListener('change', updateServiceOptions);
+                }
                 if (serviceSelect) {
                     serviceSelect.addEventListener('change', updateServiceDetails);
                 }
                 document.getElementById('booking-form').addEventListener('submit', handleSubmit);
                 updateAvailableTimeSlots();
-                updateServiceDetails();
+                updateServiceOptions();  // Initialize service options based on default vehicle type
             });
         } else {
             bookingDateInput.addEventListener('change', updateAvailableTimeSlots);
+            if (vehicleTypeSelect) {
+                vehicleTypeSelect.addEventListener('change', updateServiceOptions);
+            }
             if (serviceSelect) {
                 serviceSelect.addEventListener('change', updateServiceDetails);
             }
             document.getElementById('booking-form').addEventListener('submit', handleSubmit);
             updateAvailableTimeSlots();
-            updateServiceDetails();
+            updateServiceOptions();  // Initialize service options based on default vehicle type
         }
     </script>
 </body>

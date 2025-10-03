@@ -2,8 +2,31 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils import timezone
-from .models import Service, Booking, ServiceImage, Payment
+from .models import VehicleType, Service, Booking, ServiceImage, Payment
 from .stripe_utils import StripePaymentService
+
+@admin.register(VehicleType)
+class VehicleTypeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'price_multiplier', 'display_order', 'is_active', 'created_at']
+    list_filter = ['is_active']
+    list_editable = ['price_multiplier', 'display_order', 'is_active']
+    search_fields = ['name', 'description']
+    ordering = ['display_order', 'name']
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'description', 'price_multiplier')
+        }),
+        ('Display Settings', {
+            'fields': ('display_order', 'is_active')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    readonly_fields = ['created_at', 'updated_at']
+
 
 class ServiceImageInline(admin.TabularInline):
     model = ServiceImage
@@ -12,14 +35,17 @@ class ServiceImageInline(admin.TabularInline):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ['name', 'tier', 'price', 'duration_minutes', 'display_order', 'is_active']
-    list_filter = ['tier', 'is_active']
-    list_editable = ['price', 'duration_minutes', 'display_order', 'is_active']
-    ordering = ['display_order', 'price']
+    list_display = ['name', 'vehicle_type', 'tier', 'price', 'duration_minutes', 'display_order', 'is_active']
+    list_filter = ['vehicle_type', 'tier', 'is_active']
+    list_editable = ['vehicle_type', 'price', 'duration_minutes', 'display_order', 'is_active']
+    ordering = ['vehicle_type', 'display_order', 'price']
+    search_fields = ['name', 'description']
     inlines = [ServiceImageInline]
+
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'tier', 'description', 'price', 'duration_minutes')
+            'fields': ('name', 'vehicle_type', 'tier', 'description', 'price', 'duration_minutes'),
+            'description': 'Select the vehicle type this service is available for. You can manage vehicle types in the Vehicle Types section.'
         }),
         ('Details', {
             'fields': ('features', 'details'),
@@ -30,10 +56,22 @@ class ServiceAdmin(admin.ModelAdmin):
         }),
     )
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """Customize the vehicle_type dropdown to show only active types"""
+        if db_field.name == "vehicle_type":
+            kwargs["queryset"] = VehicleType.objects.filter(is_active=True).order_by('display_order', 'name')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    class Media:
+        css = {
+            'all': ('admin/css/hide-related-links.css',)
+        }
+        js = ('admin/js/hide-related-links.js',)
+
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'service', 'booking_date', 'booking_time', 'booking_end_time', 'status_badge', 'is_confirmed', 'payment_status']
-    list_filter = ['booking_date', 'service', 'status', 'is_confirmed']
+    list_display = ['__str__', 'vehicle_type', 'service', 'booking_date', 'booking_time', 'booking_end_time', 'status_badge', 'is_confirmed', 'payment_status']
+    list_filter = ['booking_date', 'vehicle_type', 'service', 'status', 'is_confirmed']
     search_fields = ['first_name', 'last_name', 'email', 'phone']
     date_hierarchy = 'booking_date'
     readonly_fields = ['booking_end_time', 'total_price', 'created_at', 'updated_at', 'cancelled_at']
@@ -44,7 +82,7 @@ class BookingAdmin(admin.ModelAdmin):
             'fields': ('first_name', 'last_name', 'email', 'phone')
         }),
         ('Service Details', {
-            'fields': ('service', 'booking_date', 'booking_time', 'booking_end_time', 'total_price')
+            'fields': ('vehicle_type', 'service', 'booking_date', 'booking_time', 'booking_end_time', 'total_price')
         }),
         ('Location', {
             'fields': ('address', 'city', 'zip_code')

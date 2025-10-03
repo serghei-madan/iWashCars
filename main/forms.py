@@ -14,7 +14,7 @@ class BookingForm(forms.ModelForm):
 
     class Meta:
         model = Booking
-        fields = ['first_name', 'last_name', 'email', 'phone', 'service',
+        fields = ['first_name', 'last_name', 'email', 'phone', 'vehicle_type', 'service',
                  'booking_date', 'booking_time', 'address', 'city', 'zip_code']
 
         widgets = {
@@ -22,6 +22,7 @@ class BookingForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'input input-bordered w-full', 'placeholder': 'Last Name'}),
             'email': forms.EmailInput(attrs={'class': 'input input-bordered w-full', 'placeholder': 'Email Address'}),
             'phone': forms.TextInput(attrs={'class': 'input input-bordered w-full', 'placeholder': '(555) 123-4567'}),
+            'vehicle_type': forms.Select(attrs={'class': 'select select-bordered w-full', 'id': 'vehicle-type-select'}),
             'service': forms.Select(attrs={'class': 'select select-bordered w-full', 'id': 'service-select', 'onchange': 'updateServiceDetails()'}),
             'booking_date': forms.DateInput(attrs={'type': 'date', 'class': 'input input-bordered w-full', 'id': 'booking-date'}),
             'address': forms.Textarea(attrs={'class': 'textarea textarea-bordered w-full', 'placeholder': 'Street Address', 'rows': 3}),

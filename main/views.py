@@ -55,10 +55,19 @@ def booking(request):
             current_slot += timedelta(minutes=30)
 
     # Get services for JavaScript
-    services = Service.objects.filter(is_active=True).values(
-        'id', 'name', 'price', 'duration_minutes', 'description', 'tier'
+    services = Service.objects.filter(is_active=True).select_related('vehicle_type').values(
+        'id', 'name', 'price', 'duration_minutes', 'description', 'tier', 'vehicle_type__id', 'vehicle_type__name'
     )
-    service_data = {str(s['id']): s for s in services}
+    service_data = {str(s['id']): {
+        'id': s['id'],
+        'name': s['name'],
+        'price': str(s['price']),
+        'duration_minutes': s['duration_minutes'],
+        'description': s['description'],
+        'tier': s['tier'],
+        'vehicle_type_id': s['vehicle_type__id'],
+        'vehicle_type_name': s['vehicle_type__name']
+    } for s in services}
 
     return render(request, 'main/booking.html', {
         'form': form,

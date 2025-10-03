@@ -1,6 +1,30 @@
 from django.db import models
 from django.core.validators import RegexValidator
-from decimal import Decimal
+
+
+class VehicleType(models.Model):
+    """Vehicle types for services (e.g., Regular Car, SUV, Truck)"""
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True, help_text="Description of this vehicle type")
+    price_multiplier = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        default=1.00,
+        help_text="Price multiplier for this vehicle type (e.g., 1.0 for regular, 1.5 for 50% surcharge)"
+    )
+    display_order = models.IntegerField(default=0, help_text="Order in which to display (lower numbers first)")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['display_order', 'name']
+        verbose_name = 'Vehicle Type'
+        verbose_name_plural = 'Vehicle Types'
+
+    def __str__(self):
+        return self.name
+
 
 class Service(models.Model):
     TIER_CHOICES = [
@@ -11,6 +35,7 @@ class Service(models.Model):
 
     name = models.CharField(max_length=100)
     tier = models.CharField(max_length=20, choices=TIER_CHOICES)
+    vehicle_type = models.ForeignKey(VehicleType, on_delete=models.PROTECT, related_name='services')
     description = models.TextField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
     duration_minutes = models.IntegerField(help_text="Duration in minutes")
@@ -89,7 +114,8 @@ class Booking(models.Model):
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone = models.CharField(validators=[phone_regex], max_length=17, blank=True)
 
-    # Service details
+    # Vehicle and Service details
+    vehicle_type = models.ForeignKey(VehicleType, on_delete=models.PROTECT, related_name='bookings')
     service = models.ForeignKey(Service, on_delete=models.PROTECT, related_name='bookings')
     booking_date = models.DateField()
     booking_time = models.TimeField()
