@@ -167,3 +167,8 @@ secrets.json
 
 # Tailwind CSS
 tailwindcss-*
+
+# Documentation files (may contain sensitive info or examples)
+MAILGUN_SETUP.md
+CANCELLATION_GUIDE.md
+RECEIPT_EMAIL_DOCUMENTATION.md
