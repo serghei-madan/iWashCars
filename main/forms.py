@@ -33,8 +33,8 @@ class BookingForm(forms.ModelForm):
         self.fields['service'].queryset = Service.objects.filter(is_active=True)
 
         time_choices = [('', 'Select a time')]
-        start_time = time(8, 0)
-        end_time = time(18, 0)
+        start_time = time(7, 0)  # 7:00 AM
+        end_time = time(21, 0)   # 9:00 PM
 
         current_time = datetime.combine(datetime.today(), start_time)
         end_datetime = datetime.combine(datetime.today(), end_time)

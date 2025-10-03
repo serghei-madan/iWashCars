@@ -41,11 +41,13 @@ def booking(request):
             unavailable_slots[date_str] = []
 
         # Mark all slots during the service duration as unavailable
+        # Add 30 minutes commute time after service
         start_time = datetime.combine(booking_info['booking_date'], booking_info['booking_time'])
         end_time = datetime.combine(booking_info['booking_date'], booking_info['booking_end_time'])
+        end_time_with_commute = end_time + timedelta(minutes=30)  # Add 30 min commute buffer
 
         current_slot = start_time
-        while current_slot < end_time:
+        while current_slot < end_time_with_commute:
             time_str = current_slot.strftime('%H:%M')
             if time_str not in unavailable_slots[date_str]:
                 unavailable_slots[date_str].append(time_str)
