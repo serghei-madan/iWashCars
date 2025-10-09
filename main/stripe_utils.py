@@ -16,11 +16,12 @@ class StripePaymentService:
     @staticmethod
     def create_payment_intent(booking, customer_email):
         """
-        Create a Stripe PaymentIntent with manual capture for deposit + authorization
+        Create a Stripe PaymentIntent for deposit with setup_future_usage to save payment method
+        This allows us to charge the remaining amount later without time limits
         """
         try:
             total_amount_cents = int(booking.service.price * 100)
-            deposit_amount_cents = settings.STRIPE_DEPOSIT_AMOUNT
+            deposit_amount_cents = booking.service.get_deposit_amount()  # Get deposit from service
 
             # Create or retrieve Stripe customer
             customer = stripe.Customer.create(
@@ -32,12 +33,14 @@ class StripePaymentService:
                 }
             )
 
-            # Create PaymentIntent with manual capture
+            # Create PaymentIntent for deposit with setup_future_usage
+            # This saves the payment method for future off-session charges (no 7-day limit!)
             intent = stripe.PaymentIntent.create(
-                amount=total_amount_cents,
+                amount=deposit_amount_cents,  # Only charge deposit now
                 currency='usd',
                 customer=customer.id,
                 capture_method='manual',  # This allows us to authorize and capture separately
+                setup_future_usage='off_session',  # Save payment method for future charges
                 metadata={
                     'booking_id': str(booking.id),
                     'service_name': booking.service.name,
@@ -45,6 +48,7 @@ class StripePaymentService:
                     'booking_date': str(booking.booking_date),
                     'booking_time': str(booking.booking_time),
                     'deposit_amount': str(deposit_amount_cents),
+                    'total_amount': str(total_amount_cents),
                 }
             )
 
@@ -76,19 +80,26 @@ class StripePaymentService:
     @staticmethod
     def capture_deposit(payment):
         """
-        Capture the deposit amount from the authorized PaymentIntent
+        Capture the deposit amount and save the payment method for future charges
         """
         try:
-            # First capture the deposit amount
-            stripe.PaymentIntent.capture(
+            # Capture the deposit amount
+            captured_intent = stripe.PaymentIntent.capture(
                 payment.stripe_payment_intent_id,
                 amount_to_capture=payment.deposit_amount
             )
 
-            # Update payment record
+            # Retrieve the payment method ID from the captured intent
+            # This will be used for future off-session charges
+            payment_method_id = captured_intent.payment_method
+
+            # Update payment record with payment method and status
             payment.status = 'deposit_captured'
             payment.deposit_captured_at = timezone.now()
+            payment.saved_payment_method_id = payment_method_id
             payment.save()
+
+            logger.info(f"Deposit captured and payment method {payment_method_id} saved for booking #{payment.booking.id}")
 
             return {
                 'success': True,
@@ -106,9 +117,81 @@ class StripePaymentService:
             }
 
     @staticmethod
+    def charge_saved_payment_method(payment, amount_cents):
+        """
+        Create a new PaymentIntent to charge a saved payment method off-session
+        This has no time limits - can be used weeks or months after the initial booking
+
+        Args:
+            payment: Payment object with saved_payment_method_id
+            amount_cents: Amount to charge in cents
+
+        Returns:
+            dict with success status and message or error
+        """
+        if not payment.saved_payment_method_id:
+            return {
+                'success': False,
+                'error': 'No saved payment method found. Customer needs to provide payment details.'
+            }
+
+        try:
+            # Create a new PaymentIntent with the saved payment method
+            intent = stripe.PaymentIntent.create(
+                amount=amount_cents,
+                currency='usd',
+                customer=payment.stripe_customer_id,
+                payment_method=payment.saved_payment_method_id,
+                off_session=True,  # Indicates customer is not present
+                confirm=True,  # Immediately confirm the payment
+                metadata={
+                    'booking_id': str(payment.booking.id),
+                    'payment_type': 'final_payment',
+                    'service_name': payment.booking.service.name,
+                    'customer_name': f"{payment.booking.first_name} {payment.booking.last_name}",
+                }
+            )
+
+            logger.info(f"Successfully charged ${amount_cents/100:.2f} for booking #{payment.booking.id} using saved payment method")
+
+            return {
+                'success': True,
+                'payment_intent_id': intent.id,
+                'amount_charged': amount_cents,
+                'message': f'Successfully charged ${amount_cents/100:.2f}'
+            }
+
+        except stripe.error.CardError as e:
+            # Card was declined or requires authentication
+            err = e.error
+            logger.error(f"Card error charging booking #{payment.booking.id}: {err.message}")
+
+            # Check if authentication is required
+            if err.code == 'authentication_required':
+                return {
+                    'success': False,
+                    'error': 'Payment requires customer authentication. Please send a payment request email to the customer.',
+                    'requires_action': True,
+                    'payment_intent_id': err.payment_intent.id if hasattr(err, 'payment_intent') else None
+                }
+
+            return {
+                'success': False,
+                'error': f'Card was declined: {err.message}'
+            }
+
+        except stripe.error.StripeError as e:
+            logger.error(f"Stripe error charging booking #{payment.booking.id}: {str(e)}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @staticmethod
     def capture_remaining_amount(payment):
         """
-        Capture the remaining amount after deposit
+        Charge the remaining amount using the saved payment method
+        Uses the new off-session charge method - no 7-day limit!
         """
         if not payment.can_capture_remaining():
             return {
@@ -117,72 +200,33 @@ class StripePaymentService:
             }
 
         try:
-            # Get the original PaymentIntent to check current state
-            intent = stripe.PaymentIntent.retrieve(payment.stripe_payment_intent_id)
-
-            # Debug: Log the intent status and amounts
-            print(f"PaymentIntent status: {intent.status}")
-            print(f"Amount: {intent.amount}, Amount Received: {getattr(intent, 'amount_received', 0)}")
-            print(f"Amount Capturable: {getattr(intent, 'amount_capturable', 0)}")
-
             # Check if already fully captured
-            if intent.status == 'succeeded':
-                # Payment is already fully captured
-                amount_received = getattr(intent, 'amount_received', intent.amount)
-
-                # Update our database to reflect the correct status
-                payment.status = 'fully_captured'
-                payment.fully_captured_at = timezone.now()
-                payment.save()
-
-                # Send service completion receipt email
-                try:
-                    from .notification_utils import NotificationService
-                    receipt_result = NotificationService.send_service_completion_receipt(payment)
-                    if receipt_result['success']:
-                        logger.info(f"Service completion receipt sent for payment #{payment.id}")
-                except Exception as e:
-                    logger.error(f"Error sending service completion receipt: {str(e)}")
-
+            if payment.status == 'fully_captured':
+                logger.info(f"Payment #{payment.id} already fully captured")
                 return {
                     'success': True,
-                    'message': f'Payment already fully captured. Total amount: ${amount_received/100:.2f}',
-                    'receipt_sent': receipt_result.get('success', False) if 'receipt_result' in locals() else False
+                    'message': f'Payment already fully captured. Total: ${payment.get_total_amount_dollars():.2f}'
                 }
 
-            # Check what's already been captured
-            amount_already_captured = getattr(intent, 'amount_received', 0)
-            total_authorized = intent.amount
-            amount_capturable = getattr(intent, 'amount_capturable', 0)
-
-            # If nothing left to capture
-            if amount_capturable <= 0:
-                # Check if it's because everything was already captured
-                if amount_already_captured >= total_authorized:
-                    payment.status = 'fully_captured'
-                    payment.fully_captured_at = timezone.now()
-                    payment.save()
-
-                    return {
-                        'success': True,
-                        'message': f'Payment already fully captured. Total: ${total_authorized/100:.2f}'
-                    }
-                else:
-                    return {
-                        'success': False,
-                        'error': f'No amount available to capture. Status: {intent.status}, Captured: ${amount_already_captured/100:.2f} of ${total_authorized/100:.2f}'
-                    }
-
-            # Capture the remaining amount
-            captured_intent = stripe.PaymentIntent.capture(
-                payment.stripe_payment_intent_id,
-                amount_to_capture=amount_capturable
+            # Charge the remaining amount using saved payment method
+            charge_result = StripePaymentService.charge_saved_payment_method(
+                payment,
+                payment.remaining_amount
             )
+
+            if not charge_result['success']:
+                # Log the error but don't update status yet
+                payment.notes = f'Remaining payment failed: {charge_result["error"]}'
+                payment.save()
+                return charge_result
 
             # Update payment record
             payment.status = 'fully_captured'
             payment.fully_captured_at = timezone.now()
+            payment.notes = f'Remaining ${payment.get_remaining_amount_dollars():.2f} charged successfully via saved payment method'
             payment.save()
+
+            logger.info(f"Remaining amount captured for booking #{payment.booking.id}. Total paid: ${payment.get_total_amount_dollars():.2f}")
 
             # Send service completion receipt email
             try:
@@ -194,36 +238,16 @@ class StripePaymentService:
                     logger.error(f"Failed to send receipt: {receipt_result.get('error')}")
             except Exception as e:
                 logger.error(f"Error sending service completion receipt: {str(e)}")
+                receipt_result = {'success': False}
 
-            final_amount = getattr(captured_intent, 'amount_received', amount_capturable)
             return {
                 'success': True,
-                'message': f'Successfully captured ${amount_capturable/100:.2f}. Total captured: ${final_amount/100:.2f}',
-                'receipt_sent': receipt_result.get('success', False) if 'receipt_result' in locals() else False
+                'message': f'Successfully charged remaining ${payment.get_remaining_amount_dollars():.2f}. Total paid: ${payment.get_total_amount_dollars():.2f}',
+                'receipt_sent': receipt_result.get('success', False)
             }
 
-        except stripe.error.InvalidRequestError as e:
-            # Handle the specific "already captured" error
-            if 'already been captured' in str(e):
-                # Update our database to reflect that it's fully captured
-                payment.status = 'fully_captured'
-                payment.fully_captured_at = timezone.now()
-                payment.notes = 'Payment was already captured in Stripe'
-                payment.save()
-
-                return {
-                    'success': True,
-                    'message': f'Payment was already fully captured. Database updated to reflect current status.'
-                }
-            else:
-                payment.notes = f'Capture failed: {str(e)}'
-                payment.save()
-                return {
-                    'success': False,
-                    'error': str(e),
-                }
-
-        except stripe.error.StripeError as e:
+        except Exception as e:
+            logger.error(f"Unexpected error in capture_remaining_amount: {str(e)}")
             payment.notes = f'Remaining capture failed: {str(e)}'
             payment.save()
 

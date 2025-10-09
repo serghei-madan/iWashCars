@@ -35,16 +35,21 @@ class ServiceImageInline(admin.TabularInline):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ['name', 'vehicle_type', 'tier', 'price', 'duration_minutes', 'display_order', 'is_active']
+    list_display = ['name', 'vehicle_type', 'tier', 'price', 'deposit_display', 'duration_minutes', 'display_order', 'is_active']
     list_filter = ['vehicle_type', 'tier', 'is_active']
     list_editable = ['vehicle_type', 'price', 'duration_minutes', 'display_order', 'is_active']
     ordering = ['vehicle_type', 'display_order', 'price']
     search_fields = ['name', 'description']
     inlines = [ServiceImageInline]
 
+    def deposit_display(self, obj):
+        """Display deposit amount in dollars"""
+        return f"${obj.get_deposit_amount_dollars():.2f}"
+    deposit_display.short_description = 'Deposit'
+
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'vehicle_type', 'tier', 'description', 'price', 'duration_minutes'),
+            'fields': ('name', 'vehicle_type', 'tier', 'description', 'price', 'deposit_amount', 'duration_minutes'),
             'description': 'Select the vehicle type this service is available for. You can manage vehicle types in the Vehicle Types section.'
         }),
         ('Details', {
@@ -75,7 +80,7 @@ class BookingAdmin(admin.ModelAdmin):
     search_fields = ['first_name', 'last_name', 'email', 'phone']
     date_hierarchy = 'booking_date'
     readonly_fields = ['booking_end_time', 'total_price', 'created_at', 'updated_at', 'cancelled_at']
-    actions = ['cancel_booking', 'mark_completed', 'mark_no_show']
+    actions = ['complete_service_and_finalize_payment', 'cancel_booking', 'mark_completed', 'mark_no_show']
 
     fieldsets = (
         ('Customer Information', {
@@ -133,6 +138,112 @@ class BookingAdmin(admin.ModelAdmin):
             return format_html('<span style="color: red;">No Payment</span>')
 
     payment_status.short_description = 'Payment Status'
+
+    def complete_service_and_finalize_payment(self, request, queryset):
+        """Complete service and automatically finalize payment in one action"""
+        successful = 0
+        failed = 0
+        already_completed = 0
+
+        for booking in queryset:
+            # Check if already completed
+            if booking.status == 'completed':
+                already_completed += 1
+                self.message_user(request, f"⚠️  {booking}: Already completed", level='WARNING')
+                continue
+
+            # Check if booking can be completed (must be pending or confirmed)
+            if booking.status not in ['pending', 'confirmed']:
+                failed += 1
+                self.message_user(
+                    request,
+                    f"⚠️  {booking}: Cannot complete - status is '{booking.get_status_display()}'",
+                    level='WARNING'
+                )
+                continue
+
+            try:
+                # Try to capture payment first
+                payment_result = None
+                try:
+                    payment = booking.payment
+
+                    # Check if payment can be captured
+                    if payment.can_capture_remaining():
+                        payment_result = StripePaymentService.capture_remaining_amount(payment)
+
+                        if not payment_result['success']:
+                            # Payment failed - don't mark as completed
+                            failed += 1
+                            error_msg = payment_result.get('error', 'Unknown error')
+                            self.message_user(
+                                request,
+                                f"❌ {booking}: Payment capture failed - {error_msg}. Booking NOT marked as completed.",
+                                level='ERROR'
+                            )
+                            continue
+                    elif payment.status == 'fully_captured':
+                        # Already fully paid
+                        payment_result = {'success': True, 'message': 'Payment already fully captured'}
+                    else:
+                        # Payment status doesn't allow capture
+                        failed += 1
+                        self.message_user(
+                            request,
+                            f"⚠️  {booking}: Cannot capture payment - status is '{payment.get_status_display()}'",
+                            level='WARNING'
+                        )
+                        continue
+
+                except Payment.DoesNotExist:
+                    # No payment record - this shouldn't happen, but handle it
+                    failed += 1
+                    self.message_user(
+                        request,
+                        f"❌ {booking}: No payment record found. Cannot complete.",
+                        level='ERROR'
+                    )
+                    continue
+
+                # Payment successful or already captured - mark booking as completed
+                booking.status = 'completed'
+                booking.save()
+
+                successful += 1
+                payment_msg = f" | Payment: {payment_result.get('message', 'Completed')}" if payment_result else ""
+                self.message_user(
+                    request,
+                    f"✅ {booking}: Service completed & payment finalized{payment_msg}",
+                )
+
+            except Exception as e:
+                failed += 1
+                self.message_user(
+                    request,
+                    f"❌ {booking}: Failed to complete - {str(e)}",
+                    level='ERROR'
+                )
+
+        # Summary messages
+        if successful:
+            self.message_user(
+                request,
+                f"🎉 Successfully completed {successful} booking(s) and finalized payment(s)"
+            )
+        if already_completed:
+            self.message_user(
+                request,
+                f"{already_completed} booking(s) were already completed",
+                level='INFO'
+            )
+        if failed:
+            self.message_user(
+                request,
+                f"⚠️  Failed to complete {failed} booking(s)",
+                level='WARNING'
+            )
+
+    complete_service_and_finalize_payment.short_description = "✅ Complete service & finalize payment"
 
     def cancel_booking(self, request, queryset):
         """Cancel selected bookings and handle payments"""

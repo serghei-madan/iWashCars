@@ -38,6 +38,10 @@ class Service(models.Model):
     vehicle_type = models.ForeignKey(VehicleType, on_delete=models.PROTECT, related_name='services')
     description = models.TextField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    deposit_amount = models.IntegerField(
+        default=2500,
+        help_text="Deposit amount in cents (e.g., 2500 = $25.00)"
+    )
     duration_minutes = models.IntegerField(help_text="Duration in minutes")
     features = models.JSONField(default=list, blank=True)  # List of features included
     details = models.TextField(blank=True, help_text="Detailed description of the service process, what's included, etc.")
@@ -67,14 +71,21 @@ class Service(models.Model):
         return end_datetime.time()
 
     def get_deposit_amount(self):
-        """Get the deposit amount ($25 in cents)"""
-        from django.conf import settings
-        return settings.STRIPE_DEPOSIT_AMOUNT
+        """Get the deposit amount in cents"""
+        return self.deposit_amount
+
+    def get_deposit_amount_dollars(self):
+        """Get the deposit amount in dollars"""
+        return self.deposit_amount / 100
 
     def get_remaining_amount(self):
         """Get the remaining amount after deposit (in cents)"""
         total_cents = int(self.price * 100)
         return total_cents - self.get_deposit_amount()
+
+    def get_remaining_amount_dollars(self):
+        """Get the remaining amount after deposit in dollars"""
+        return self.get_remaining_amount() / 100
 
 
 class ServiceImage(models.Model):
@@ -190,6 +201,7 @@ class Payment(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, related_name='payment')
     stripe_payment_intent_id = models.CharField(max_length=200, unique=True)
     stripe_customer_id = models.CharField(max_length=200, null=True, blank=True)
+    saved_payment_method_id = models.CharField(max_length=200, null=True, blank=True, help_text="Saved payment method for future charges")
 
     # Amounts in cents
     deposit_amount = models.IntegerField(default=2500)  # $25.00 in cents

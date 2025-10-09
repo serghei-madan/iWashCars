@@ -56,7 +56,7 @@ def booking(request):
 
     # Get services for JavaScript
     services = Service.objects.filter(is_active=True).select_related('vehicle_type').values(
-        'id', 'name', 'price', 'duration_minutes', 'description', 'tier', 'vehicle_type__id', 'vehicle_type__name'
+        'id', 'name', 'price', 'duration_minutes', 'description', 'tier', 'vehicle_type__id', 'vehicle_type__name', 'deposit_amount'
     )
     service_data = {str(s['id']): {
         'id': s['id'],
@@ -66,7 +66,9 @@ def booking(request):
         'description': s['description'],
         'tier': s['tier'],
         'vehicle_type_id': s['vehicle_type__id'],
-        'vehicle_type_name': s['vehicle_type__name']
+        'vehicle_type_name': s['vehicle_type__name'],
+        'deposit_amount': s['deposit_amount'],  # Deposit in cents
+        'deposit_amount_dollars': s['deposit_amount'] / 100  # Deposit in dollars
     } for s in services}
 
     return render(request, 'main/booking.html', {
@@ -74,7 +76,6 @@ def booking(request):
         'unavailable_slots': json.dumps(unavailable_slots),
         'service_data': json.dumps(service_data, default=str),
         'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
-        'deposit_amount': settings.STRIPE_DEPOSIT_AMOUNT,
     })
 
 def booking_success(request, booking_id):

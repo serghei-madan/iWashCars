@@ -243,12 +243,12 @@
                         <!-- Payment Information -->
                         <div class="bg-info/10 p-6 rounded-lg mb-6">
                             <h3 class="text-xl font-bold mb-4 text-center">💳 Payment Information</h3>
-                            <div class="text-center mb-4">
+                            <div class="text-center mb-4" id="deposit-info">
                                 <p class="text-lg">
-                                    <span class="font-semibold text-primary">Deposit Required: $25.00</span>
+                                    <span class="font-semibold text-primary" id="deposit-amount-display">Deposit Required: Select a service</span>
                                 </p>
-                                <p class="text-sm text-gray-600">
-                                    We'll charge a $25 deposit now and collect the remaining amount after service completion.
+                                <p class="text-sm text-gray-600" id="deposit-description">
+                                    We'll charge a deposit now and collect the remaining amount after service completion.
                                 </p>
                             </div>
 
@@ -275,7 +275,6 @@
     <script>
         // Stripe configuration
         const stripe = Stripe('{{ stripe_publishable_key }}');
-        const depositAmount = {{ deposit_amount }};
 
         // Form data
         const unavailableSlots = {{ unavailable_slots|safe }};
@@ -552,10 +551,14 @@
         function updateServiceDetails() {
             const selectedServiceId = serviceSelect.value;
             const seeDetailsLink = document.getElementById('see-details-link');
+            const depositAmountDisplay = document.getElementById('deposit-amount-display');
+            const depositDescription = document.getElementById('deposit-description');
 
             if (!selectedServiceId || !serviceData[selectedServiceId]) {
                 serviceDetailsDiv.style.display = 'none';
                 seeDetailsLink.style.display = 'none';
+                depositAmountDisplay.textContent = 'Deposit Required: Select a service';
+                depositDescription.textContent = 'We\'ll charge a deposit now and collect the remaining amount after service completion.';
                 return;
             }
 
@@ -564,6 +567,11 @@
             const hours = Math.floor(duration / 60);
             const minutes = duration % 60;
             const durationText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+
+            // Update deposit display
+            const depositDollars = parseFloat(service.deposit_amount_dollars).toFixed(2);
+            depositAmountDisplay.textContent = `Deposit Required: $${depositDollars}`;
+            depositDescription.textContent = `We'll charge a $${depositDollars} deposit now and collect the remaining amount after service completion.`;
 
             serviceInfoDiv.innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
