@@ -162,6 +162,9 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 DRIVER_NOTIFICATION_EMAIL = os.getenv('DRIVER_NOTIFICATION_EMAIL', 'driver@iwashcars.com')
 DRIVER_NOTIFICATION_PHONE = os.getenv('DRIVER_NOTIFICATION_PHONE', '')
 
+# Site URL for payment redirects and external links
+SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000')
+
 # Twilio Settings (for SMS)
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', '')
 TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '')

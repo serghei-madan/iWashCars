@@ -7,18 +7,6 @@ pip install -r requirements.txt
 ```
 
 2. Configure environment variables in `.env`:
-```
-# Mailgun Email Service
-MAILGUN_API_KEY=your_api_key_here
-MAILGUN_SANDBOX_DOMAIN=your_sandbox_domain.mailgun.org
-MAILGUN_BASE_URL=https://api.mailgun.net
-DEFAULT_FROM_EMAIL=postmaster@your_sandbox_domain.mailgun.org
-
-# Stripe Payment
-STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_DEPOSIT_AMOUNT=2500
-```
 
 ## Running the Application
 
