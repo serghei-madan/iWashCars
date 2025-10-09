@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('booking/', views.booking, name='booking'),
-    path('booking/success/<int:booking_id>/', views.booking_success, name='booking_success'),
+    path('booking/success/<uuid:booking_id>/', views.booking_success, name='booking_success'),
     path('service/<int:service_id>/', views.service_detail, name='service_detail'),
     # Payment endpoints
     path('api/create-payment-intent/', views.create_payment_intent, name='create_payment_intent'),
