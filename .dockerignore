@@ -52,3 +52,6 @@ Thumbs.db
 .coverage
 htmlcov/
 .pytest_cache/
+
+# Unused Next.js files (conflicts with Nixpacks)
+src/
