@@ -11,10 +11,11 @@ This guide will help you deploy iWashCars to Railway with automatic deployments 
 ## Step 1: Prepare Your Repository
 
 All necessary files have been created:
-- ✅ `Procfile` - Defines web and worker processes
-- ✅ `railway.toml` - Railway configuration
-- ✅ `runtime.txt` - Python version
-- ✅ `build.sh` - Build script
+- ✅ `Procfile` - Defines web, worker, and release processes
+- ✅ `railway.toml` - Railway deployment configuration
+- ✅ `nixpacks.toml` - Build configuration (installs deps, runs collectstatic)
+- ✅ `runtime.txt` - Python version (3.10.12)
+- ✅ `build.sh` - Build script (alternative to nixpacks.toml)
 - ✅ `requirements.txt` - Updated with production dependencies
 - ✅ `.env.example` - Environment variables template
 
@@ -151,9 +152,16 @@ Every time you push to your `main` branch:
 ### Build Fails
 
 Check the build logs in Railway. Common issues:
+- **"pip: command not found"**: This is fixed by using `nixpacks.toml` instead of custom build commands. Railway's Nixpacks automatically detects Python and sets up the environment.
 - Missing environment variables
 - Python version mismatch
 - Dependency conflicts
+
+**Note**: The project uses `nixpacks.toml` which tells Railway exactly how to build:
+1. Setup phase: Install Python 3.10 and PostgreSQL
+2. Install phase: Run `pip install -r requirements.txt`
+3. Build phase: Run `python manage.py collectstatic`
+4. Start: Run gunicorn server
 
 ### Static Files Not Loading
 
