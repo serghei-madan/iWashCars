@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: iwashcars_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: iwashcars
+      POSTGRES_USER: iwashcars_user
+      POSTGRES_PASSWORD: iwashcars_password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iwashcars_user -d iwashcars"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for Django-Q task queue
+  redis:
+    image: redis:7-alpine
+    container_name: iwashcars_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Django Web Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iwashcars_web
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn iwashcars.wsgi:application --bind 0.0.0.0:8000 --workers 3 --reload"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-local-dev-key-change-in-production
+      - DATABASE_URL=postgresql://iwashcars_user:iwashcars_password@db:5432/iwashcars
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - CSRF_TRUSTED_ORIGINS=http://localhost:8000
+      - SITE_URL=http://localhost:8000
+      # Copy from your .env file or set here
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_DEPOSIT_AMOUNT=${STRIPE_DEPOSIT_AMOUNT:-2500}
+      - MAILGUN_API_KEY=${MAILGUN_API_KEY}
+      - MAILGUN_SANDBOX_DOMAIN=${MAILGUN_SANDBOX_DOMAIN}
+      - DRIVER_NOTIFICATION_EMAIL=${DRIVER_NOTIFICATION_EMAIL}
+      - DRIVER_NOTIFICATION_PHONE=${DRIVER_NOTIFICATION_PHONE}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Django-Q Worker for background tasks
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iwashcars_worker
+    command: python manage.py qcluster
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-local-dev-key-change-in-production
+      - DATABASE_URL=postgresql://iwashcars_user:iwashcars_password@db:5432/iwashcars
+      - MAILGUN_API_KEY=${MAILGUN_API_KEY}
+      - MAILGUN_SANDBOX_DOMAIN=${MAILGUN_SANDBOX_DOMAIN}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
