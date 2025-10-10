@@ -1,4 +1,5 @@
 # Note: Provider is set to 'python' via .nixpacks file
+# Start command is defined in Procfile
 
 [phases.setup]
 nixPkgs = ["postgresql"]
@@ -14,6 +15,3 @@ cmds = [
   "mkdir -p staticfiles",
   "python manage.py collectstatic --noinput --clear"
 ]
-
-[start]
-cmd = "gunicorn iwashcars.wsgi:application --bind 0.0.0.0:$PORT --workers 3"
