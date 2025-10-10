@@ -1,0 +1,16 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+
+[deploy]
+startCommand = "gunicorn iwashcars.wsgi:application"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[[services]]
+name = "web"
+command = "gunicorn iwashcars.wsgi:application --bind 0.0.0.0:$PORT --workers 3"
+
+[[services]]
+name = "worker"
+command = "python manage.py qcluster"
