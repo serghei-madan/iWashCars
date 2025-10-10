@@ -140,9 +140,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Only use STATICFILES_DIRS if the static directory exists (development)
-if (BASE_DIR / "static").exists():
-    STATICFILES_DIRS = [BASE_DIR / "static"]
+# Source directories for static files
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Enable WhiteNoise compression and caching
 STORAGES = {
