@@ -13,11 +13,18 @@ This guide will help you deploy iWashCars to Railway with automatic deployments 
 All necessary files have been created:
 - ✅ `Procfile` - Defines web, worker, and release processes
 - ✅ `railway.toml` - Railway deployment configuration
+- ✅ `.nixpacks` - **IMPORTANT**: Forces Python provider (project has both Python and Node.js)
 - ✅ `nixpacks.toml` - Build configuration (installs deps, runs collectstatic)
 - ✅ `runtime.txt` - Python version (3.10.12)
 - ✅ `build.sh` - Build script (alternative to nixpacks.toml)
 - ✅ `requirements.txt` - Updated with production dependencies
 - ✅ `.env.example` - Environment variables template
+
+**Note:** This project uses:
+- **Python/Django** for the backend
+- **Node.js/Tailwind CSS** for styling (frontend only)
+
+The `.nixpacks` file tells Railway to use Python as the primary language, preventing "pip: command not found" errors.
 
 ## Step 2: Push to GitHub
 
@@ -149,19 +156,32 @@ Every time you push to your `main` branch:
 
 ## Troubleshooting
 
-### Build Fails
+### Build Fails: "pip: command not found"
 
-Check the build logs in Railway. Common issues:
-- **"pip: command not found"**: This is fixed by using `nixpacks.toml` instead of custom build commands. Railway's Nixpacks automatically detects Python and sets up the environment.
+**Root Cause:** Project has both `package.json` (for Tailwind CSS) and `requirements.txt` (for Django). Railway was detecting Node.js first and trying to run Python commands in a Node.js environment.
+
+**Solution:** The `.nixpacks` file forces Railway to use Python as the primary provider.
+
+**Files that fix this:**
+- `.nixpacks` - Contains just the word "python" to override auto-detection
+- `nixpacks.toml` - Defines build phases (install deps, collectstatic)
+
+If you still see this error:
+1. Make sure `.nixpacks` file exists and contains just "python"
+2. Verify `nixpacks.toml` is present
+3. Check Railway build logs for provider detection
+
+**Build Process:**
+1. Setup phase: Install Python 3.10 + PostgreSQL
+2. Install phase: `pip install -r requirements.txt`
+3. Build phase: `python manage.py collectstatic --noinput`
+4. Start: `gunicorn iwashcars.wsgi:application`
+
+### Other Build Issues
+
 - Missing environment variables
 - Python version mismatch
 - Dependency conflicts
-
-**Note**: The project uses `nixpacks.toml` which tells Railway exactly how to build:
-1. Setup phase: Install Python 3.10 and PostgreSQL
-2. Install phase: Run `pip install -r requirements.txt`
-3. Build phase: Run `python manage.py collectstatic`
-4. Start: Run gunicorn server
 
 ### Static Files Not Loading
 
