@@ -45,6 +45,10 @@ WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
+# Copy entrypoint script and make it executable
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh && chown appuser:appuser /app/entrypoint.sh
+
 # Copy application code
 COPY --chown=appuser:appuser . .
 
@@ -61,5 +65,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD python -c "import requests; requests.get('http://localhost:8000', timeout=5)" || exit 1
 
-# Run gunicorn
-CMD ["sh", "-c", "gunicorn iwashcars.wsgi:application --bind 0.0.0.0:${PORT} --workers 3 --timeout 120 --log-level info"]
+# Run gunicorn via entrypoint script
+CMD ["/app/entrypoint.sh"]
