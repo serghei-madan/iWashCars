@@ -636,9 +636,9 @@
                     return false;
                 }
 
-                // Parse the response to get booking ID (assuming redirect to success page)
+                // Parse the response to get booking ID (UUID format)
                 const responseUrl = bookingResponse.url;
-                const urlMatch = responseUrl.match(/booking\/success\/(\d+)\//);
+                const urlMatch = responseUrl.match(/booking\/success\/([0-9a-f-]+)\//);
                 if (urlMatch) {
                     bookingId = urlMatch[1];
                 } else {

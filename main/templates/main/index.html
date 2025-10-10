@@ -20,20 +20,20 @@
                     </svg>
                 </div>
                 <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow text-base-content">
-                    <li><a>Services</a></li>
-                    <li><a>Pricing</a></li>
-                    <li><a>About</a></li>
-                    <li><a>Contact</a></li>
+                    <li><a href="{% url 'services' %}">Services</a></li>
+                    <li><a href="{% url 'services' %}">Pricing</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
                 </ul>
             </div>
             <a class="btn btn-ghost text-xl font-bold">🚗 iWashCars</a>
         </div>
         <div class="navbar-center hidden lg:flex">
             <ul class="menu menu-horizontal px-1">
-                <li><a class="hover:bg-primary-focus">Services</a></li>
-                <li><a class="hover:bg-primary-focus">Pricing</a></li>
-                <li><a class="hover:bg-primary-focus">About</a></li>
-                <li><a class="hover:bg-primary-focus">Contact</a></li>
+                <li><a href="{% url 'services' %}" class="hover:bg-primary-focus">Services</a></li>
+                <li><a href="{% url 'services' %}" class="hover:bg-primary-focus">Pricing</a></li>
+                <li><a href="#about" class="hover:bg-primary-focus">About</a></li>
+                <li><a href="#contact" class="hover:bg-primary-focus">Contact</a></li>
             </ul>
         </div>
         <div class="navbar-end">
@@ -175,6 +175,97 @@
         </div>
     </div>
 
+    <!-- About Section -->
+    <div id="about" class="py-20 bg-gradient-to-b from-base-200 to-base-100">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold mb-6">About iWashCars</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Your trusted partner for premium mobile car wash and detailing services
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
+                <!-- Our Story -->
+                <div class="space-y-6">
+                    <div class="badge badge-primary badge-lg">Our Story</div>
+                    <h3 class="text-4xl font-bold">We Bring The Car Wash To You</h3>
+                    <p class="text-lg text-gray-600 leading-relaxed">
+                        Founded in North Hollywood, iWashCars was born from a simple idea: car care should be convenient, professional, and eco-friendly. We understand that your time is valuable, which is why we bring our premium services directly to your location.
+                    </p>
+                    <p class="text-lg text-gray-600 leading-relaxed">
+                        Our team of experienced professionals uses only the highest quality, biodegradable products and advanced water-saving techniques to ensure your vehicle gets the care it deserves while protecting our environment.
+                    </p>
+                    <div class="stats shadow bg-base-100">
+                        <div class="stat">
+                            <div class="stat-figure text-primary">
+                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <div class="stat-title">Happy Customers</div>
+                            <div class="stat-value text-primary">1000+</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-figure text-secondary">
+                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                                </svg>
+                            </div>
+                            <div class="stat-title">Years in Business</div>
+                            <div class="stat-value text-secondary">5+</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image/Visual Element -->
+                <div class="relative">
+                    <div class="rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-blue-500 to-blue-700 h-96 flex items-center justify-center">
+                        <div class="text-center text-white p-8">
+                            <div class="text-8xl mb-6">🚗✨</div>
+                            <h4 class="text-3xl font-bold mb-4">Professional Mobile Service</h4>
+                            <p class="text-xl">Serving North Hollywood & Surrounding Areas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Our Values -->
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold mb-8">Our Values</h3>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                    <div class="card-body items-center text-center">
+                        <div class="text-5xl mb-4">🌟</div>
+                        <h4 class="card-title text-2xl">Quality First</h4>
+                        <p class="text-gray-600">
+                            We never compromise on the quality of our work. Every vehicle receives our full attention and care, using only premium products.
+                        </p>
+                    </div>
+                </div>
+                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                    <div class="card-body items-center text-center">
+                        <div class="text-5xl mb-4">🌍</div>
+                        <h4 class="card-title text-2xl">Eco-Conscious</h4>
+                        <p class="text-gray-600">
+                            Environmental responsibility is at our core. We use biodegradable products and water-efficient techniques.
+                        </p>
+                    </div>
+                </div>
+                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                    <div class="card-body items-center text-center">
+                        <div class="text-5xl mb-4">🤝</div>
+                        <h4 class="card-title text-2xl">Customer Focused</h4>
+                        <p class="text-gray-600">
+                            Your satisfaction is our priority. We're committed to providing exceptional service and building lasting relationships.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- CTA Section -->
     <div class="hero py-16 bg-gradient-to-r from-secondary to-accent">
         <div class="hero-content text-center text-white">
@@ -190,11 +281,11 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer footer-center p-10 bg-base-200 text-base-content">
+    <footer id="contact" class="footer footer-center p-10 bg-base-200 text-base-content">
         <nav class="grid grid-flow-col gap-4">
-            <a class="link link-hover">About us</a>
-            <a class="link link-hover">Contact</a>
-            <a class="link link-hover">Services</a>
+            <a href="#about" class="link link-hover">About us</a>
+            <a href="#contact" class="link link-hover">Contact</a>
+            <a href="{% url 'services' %}" class="link link-hover">Services</a>
             <a class="link link-hover">Privacy Policy</a>
         </nav>
         <nav>
@@ -209,5 +300,31 @@
             <p class="text-sm opacity-70">📞 (555) 123-WASH | 📧 info@iwashcars.com</p>
         </aside>
     </footer>
+
+    <!-- Smooth Scroll Script -->
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+
+                    // Close mobile menu if open
+                    const activeElement = document.activeElement;
+                    if (activeElement) {
+                        activeElement.blur();
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>

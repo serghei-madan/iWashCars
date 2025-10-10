@@ -85,6 +85,26 @@ def booking_success(request, booking_id):
     except Booking.DoesNotExist:
         return redirect('index')
 
+def services(request):
+    """Display all active services organized by vehicle type"""
+    from collections import defaultdict
+
+    # Get all active services with related data
+    all_services = Service.objects.filter(is_active=True).select_related('vehicle_type').prefetch_related('images').order_by('vehicle_type__display_order', 'tier', 'price')
+
+    # Organize services by vehicle type
+    services_by_vehicle = defaultdict(list)
+    for service in all_services:
+        services_by_vehicle[service.vehicle_type].append(service)
+
+    # Convert to regular dict and sort by vehicle type display order
+    services_by_vehicle = dict(sorted(services_by_vehicle.items(), key=lambda x: x[0].display_order))
+
+    return render(request, 'main/services.html', {
+        'services_by_vehicle': services_by_vehicle,
+        'all_services': all_services,
+    })
+
 def service_detail(request, service_id):
     service = get_object_or_404(Service, id=service_id, is_active=True)
     return render(request, 'main/service_detail.html', {'service': service})

@@ -1,0 +1,376 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Services - iWashCars</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <style>
+        .service-section {
+            min-height: 70vh;
+        }
+        .image-gallery img {
+            transition: transform 0.3s ease;
+        }
+        .image-gallery img:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-base-100">
+    <!-- Navbar -->
+    <div class="navbar bg-primary text-primary-content sticky top-0 z-50 shadow-lg">
+        <div class="navbar-start">
+            <div class="dropdown">
+                <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
+                    </svg>
+                </div>
+                <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow text-base-content">
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="{% url 'services' %}" class="active">Services</a></li>
+                    <li><a href="{% url 'booking' %}">Book Now</a></li>
+                </ul>
+            </div>
+            <a href="{% url 'index' %}" class="btn btn-ghost text-xl font-bold">🚗 iWashCars</a>
+        </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="{% url 'index' %}" class="hover:bg-primary-focus">Home</a></li>
+                <li><a href="{% url 'services' %}" class="hover:bg-primary-focus active">Services</a></li>
+                <li><a href="{% url 'booking' %}" class="hover:bg-primary-focus">Book Now</a></li>
+            </ul>
+        </div>
+        <div class="navbar-end">
+            <a href="{% url 'booking' %}" class="btn btn-secondary">Book Now</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero min-h-[60vh] bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="hero-content text-center z-10">
+            <div class="max-w-4xl">
+                <h1 class="text-6xl md:text-7xl font-bold mb-6 drop-shadow-lg">Our Services</h1>
+                <p class="text-2xl text-blue-100 mb-8 drop-shadow">
+                    Experience premium mobile car wash and detailing services
+                </p>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl px-8 py-4 border border-white/30">
+                        <div class="text-sm text-blue-100 uppercase tracking-wider">Services</div>
+                        <div class="text-3xl font-bold">{{ all_services.count }}</div>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl px-8 py-4 border border-white/30">
+                        <div class="text-sm text-blue-100 uppercase tracking-wider">Vehicle Types</div>
+                        <div class="text-3xl font-bold">{{ services_by_vehicle|length }}</div>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl px-8 py-4 border border-white/30">
+                        <div class="text-sm text-blue-100 uppercase tracking-wider">Starting From</div>
+                        <div class="text-3xl font-bold">${{ all_services.first.price|default:"--" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Gallery -->
+    {% for vehicle_type, services in services_by_vehicle.items %}
+    <!-- Vehicle Type Divider -->
+    <div class="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 py-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="inline-flex items-center gap-4 bg-primary text-primary-content px-8 py-3 rounded-full shadow-lg">
+                <div class="text-2xl">🚗</div>
+                <h2 class="text-3xl font-bold">{{ vehicle_type.name }}</h2>
+            </div>
+            {% if vehicle_type.description %}
+            <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">{{ vehicle_type.description }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Service Presentations -->
+    {% for service in services %}
+    <section class="service-section relative {% if forloop.counter|divisibleby:2 %}bg-base-200{% else %}bg-base-100{% endif %}">
+        <div class="container mx-auto px-4 py-20">
+            <div class="grid lg:grid-cols-2 gap-12 items-center {% if forloop.counter|divisibleby:2 %}lg:grid-flow-dense{% endif %}">
+
+                <!-- Service Info -->
+                <div class="{% if forloop.counter|divisibleby:2 %}lg:col-start-2{% endif %} space-y-6">
+                    <!-- Tier Badge -->
+                    <div class="flex items-center gap-3">
+                        <div class="badge {% if service.tier == 'premium' %}badge-secondary{% elif service.tier == 'deluxe' %}badge-accent{% else %}badge-primary{% endif %} badge-lg">
+                            {{ service.get_tier_display }}
+                        </div>
+                        {% if service.tier == 'premium' %}
+                        <div class="badge badge-outline badge-lg">Most Popular</div>
+                        {% elif service.tier == 'deluxe' %}
+                        <div class="badge badge-outline badge-lg">Premium Choice</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Service Name -->
+                    <h3 class="text-5xl font-bold text-gray-800">{{ service.name }}</h3>
+
+                    <!-- Description -->
+                    <p class="text-xl text-gray-600 leading-relaxed">{{ service.description }}</p>
+
+                    <!-- Pricing & Duration -->
+                    <div class="flex flex-wrap gap-4">
+                        <div class="bg-primary text-primary-content rounded-2xl px-8 py-4 shadow-lg">
+                            <div class="text-sm uppercase tracking-wider opacity-90">Price</div>
+                            <div class="text-4xl font-bold">${{ service.price }}</div>
+                        </div>
+                        <div class="bg-base-300 rounded-2xl px-8 py-4 shadow-lg">
+                            <div class="text-sm uppercase tracking-wider text-gray-600">Duration</div>
+                            <div class="text-4xl font-bold text-gray-800">{{ service.get_duration_display }}</div>
+                        </div>
+                        <div class="bg-info/20 text-info-content rounded-2xl px-8 py-4 shadow-lg">
+                            <div class="text-sm uppercase tracking-wider">Deposit</div>
+                            <div class="text-4xl font-bold">${{ service.get_deposit_amount_dollars }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    {% if service.features %}
+                    <div class="bg-base-100 rounded-2xl p-6 shadow-lg {% if forloop.counter|divisibleby:2 %}bg-base-300{% endif %}">
+                        <h4 class="text-2xl font-bold mb-4 text-gray-800">What's Included</h4>
+                        <div class="grid md:grid-cols-2 gap-3">
+                            {% for feature in service.features %}
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-success flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span class="text-gray-700 text-lg">{{ feature }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap gap-4 pt-4">
+                        <a href="{% url 'booking' %}" class="btn {% if service.tier == 'premium' %}btn-secondary{% elif service.tier == 'deluxe' %}btn-accent{% else %}btn-primary{% endif %} btn-lg text-lg px-8">
+                            <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Book This Service
+                        </a>
+                        <a href="{% url 'service_detail' service.id %}" class="btn btn-outline btn-lg text-lg px-8">
+                            View Full Details
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Image Gallery -->
+                <div class="{% if forloop.counter|divisibleby:2 %}lg:col-start-1 lg:row-start-1{% endif %}">
+                    {% if service.images.all %}
+                    <div class="image-gallery">
+                        {% if service.images.all|length == 1 %}
+                        <!-- Single Large Image -->
+                        <div class="rounded-3xl overflow-hidden shadow-2xl">
+                            <img src="{{ service.images.all.0.image.url }}"
+                                 alt="{{ service.images.all.0.alt_text|default:service.name }}"
+                                 class="w-full h-[500px] object-cover cursor-pointer"
+                                 onclick="document.getElementById('modal-{{ service.id }}-0').showModal()">
+                        </div>
+
+                        {% elif service.images.all|length == 2 %}
+                        <!-- Two Images Stacked -->
+                        <div class="grid grid-rows-2 gap-4">
+                            {% for image in service.images.all %}
+                            <div class="rounded-3xl overflow-hidden shadow-2xl">
+                                <img src="{{ image.image.url }}"
+                                     alt="{{ image.alt_text|default:service.name }}"
+                                     class="w-full h-[240px] object-cover cursor-pointer"
+                                     onclick="document.getElementById('modal-{{ service.id }}-{{ forloop.counter0 }}').showModal()">
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        {% elif service.images.all|length >= 3 %}
+                        <!-- Multiple Images in Grid -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Large main image -->
+                            <div class="col-span-2 rounded-3xl overflow-hidden shadow-2xl">
+                                <img src="{{ service.images.all.0.image.url }}"
+                                     alt="{{ service.images.all.0.alt_text|default:service.name }}"
+                                     class="w-full h-[300px] object-cover cursor-pointer"
+                                     onclick="document.getElementById('modal-{{ service.id }}-0').showModal()">
+                            </div>
+                            <!-- Smaller images -->
+                            {% for image in service.images.all|slice:"1:3" %}
+                            <div class="rounded-2xl overflow-hidden shadow-xl">
+                                <img src="{{ image.image.url }}"
+                                     alt="{{ image.alt_text|default:service.name }}"
+                                     class="w-full h-[180px] object-cover cursor-pointer"
+                                     onclick="document.getElementById('modal-{{ service.id }}-{{ forloop.counter }}').showModal()">
+                            </div>
+                            {% endfor %}
+                            {% if service.images.all|length > 3 %}
+                            <div class="col-span-2 text-center">
+                                <a href="{% url 'service_detail' service.id %}" class="btn btn-outline btn-sm">
+                                    +{{ service.images.all|length|add:"-3" }} More Photos
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Image Modals -->
+                        {% for image in service.images.all %}
+                        <dialog id="modal-{{ service.id }}-{{ forloop.counter0 }}" class="modal">
+                            <div class="modal-box max-w-6xl p-0">
+                                <form method="dialog">
+                                    <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 z-10 bg-black/50 text-white hover:bg-black/70">✕</button>
+                                </form>
+                                <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:service.name }}" class="w-full rounded-2xl">
+                                {% if image.alt_text %}
+                                <div class="p-6">
+                                    <p class="text-center text-gray-600">{{ image.alt_text }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <form method="dialog" class="modal-backdrop">
+                                <button>close</button>
+                            </form>
+                        </dialog>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <!-- Placeholder when no images -->
+                    <div class="rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 h-[500px] flex items-center justify-center">
+                        <div class="text-center text-white">
+                            <div class="text-9xl mb-4">
+                                {% if service.tier == 'basic' %}🧽
+                                {% elif service.tier == 'premium' %}✨
+                                {% elif service.tier == 'deluxe' %}👑
+                                {% endif %}
+                            </div>
+                            <h4 class="text-3xl font-bold">{{ service.name }}</h4>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endfor %}
+
+    {% if not forloop.last %}
+    <div class="divider my-0"></div>
+    {% endif %}
+    {% empty %}
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="text-center py-16">
+            <div class="text-8xl mb-6">🚗</div>
+            <h3 class="text-4xl font-bold mb-4">No Services Available</h3>
+            <p class="text-xl text-gray-600">We're currently updating our service offerings. Please check back soon!</p>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Why Choose Us Section -->
+    <div class="bg-gradient-to-b from-base-200 to-base-100 py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-5xl font-bold text-center mb-16">Why Choose iWashCars?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                    <div class="card-body items-center text-center">
+                        <div class="text-6xl mb-4">📱</div>
+                        <h3 class="card-title text-2xl">Easy Booking</h3>
+                        <p class="text-gray-600">Book online in just a few clicks with our simple booking system</p>
+                    </div>
+                </div>
+                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                    <div class="card-body items-center text-center">
+                        <div class="text-6xl mb-4">🌿</div>
+                        <h3 class="card-title text-2xl">Eco-Friendly</h3>
+                        <p class="text-gray-600">Biodegradable products and water-saving techniques</p>
+                    </div>
+                </div>
+                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                    <div class="card-body items-center text-center">
+                        <div class="text-6xl mb-4">⚡</div>
+                        <h3 class="card-title text-2xl">Fast Service</h3>
+                        <p class="text-gray-600">Professional wash completed quickly without compromising quality</p>
+                    </div>
+                </div>
+                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                    <div class="card-body items-center text-center">
+                        <div class="text-6xl mb-4">💯</div>
+                        <h3 class="card-title text-2xl">Guaranteed</h3>
+                        <p class="text-gray-600">100% satisfaction or we'll re-wash for free</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="hero min-h-[50vh] bg-gradient-to-r from-secondary via-accent to-secondary text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="hero-content text-center z-10">
+            <div class="max-w-3xl">
+                <h2 class="text-5xl md:text-6xl font-bold mb-6 drop-shadow-lg">Ready to Get Started?</h2>
+                <p class="text-2xl mb-10 drop-shadow">
+                    Book your mobile car wash today and experience the convenience of professional service at your location.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                    <a href="{% url 'booking' %}" class="btn btn-primary btn-lg text-xl px-10">
+                        <svg class="w-6 h-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Book Now
+                    </a>
+                    <a href="{% url 'index' %}" class="btn btn-outline btn-lg text-xl px-10 text-white border-white hover:bg-white hover:text-secondary">
+                        <svg class="w-6 h-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content">
+        <nav class="grid grid-flow-col gap-4">
+            <a href="{% url 'index' %}" class="link link-hover">Home</a>
+            <a href="{% url 'services' %}" class="link link-hover">Services</a>
+            <a href="{% url 'booking' %}" class="link link-hover">Book Now</a>
+            <a class="link link-hover">Privacy Policy</a>
+        </nav>
+        <nav>
+            <div class="grid grid-flow-col gap-4">
+                <a class="text-2xl hover:text-primary cursor-pointer">📧</a>
+                <a class="text-2xl hover:text-primary cursor-pointer">📱</a>
+                <a class="text-2xl hover:text-primary cursor-pointer">📍</a>
+            </div>
+        </nav>
+        <aside>
+            <p class="font-bold text-xl">🚗 iWashCars</p>
+            <p>Professional Mobile Car Wash & Detailing</p>
+            <p>Copyright © 2024 - All rights reserved</p>
+            <p class="text-sm opacity-70">📞 (555) 123-WASH | 📧 info@iwashcars.com</p>
+        </aside>
+    </footer>
+
+    <!-- Smooth Scroll -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
