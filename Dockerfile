@@ -1,7 +1,7 @@
 # Multi-stage Docker build for iWashCars Django application
 
 # Stage 1: Builder - Install dependencies
-FROM python:3.10-slim as builder
+FROM python:3.10-slim AS builder
 
 # Set working directory
 WORKDIR /app
@@ -62,4 +62,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD python -c "import requests; requests.get('http://localhost:8000', timeout=5)" || exit 1
 
 # Run gunicorn
-CMD gunicorn iwashcars.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120 --log-level info
+CMD ["sh", "-c", "gunicorn iwashcars.wsgi:application --bind 0.0.0.0:${PORT} --workers 3 --timeout 120 --log-level info"]
