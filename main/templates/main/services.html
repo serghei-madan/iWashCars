@@ -1,54 +1,9 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Services - iWashCars</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="{% static 'css/output.css' %}" rel="stylesheet">
-    <style>
-        .service-section {
-            min-height: 70vh;
-        }
-        .image-gallery img {
-            transition: transform 0.3s ease;
-        }
-        .image-gallery img:hover {
-            transform: scale(1.05);
-        }
-    </style>
-</head>
-<body class="bg-base-100">
-    <!-- Navbar -->
-    <div class="navbar bg-primary text-primary-content sticky top-0 z-50 shadow-lg">
-        <div class="navbar-start">
-            <div class="dropdown">
-                <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
-                    </svg>
-                </div>
-                <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow text-base-content">
-                    <li><a href="{% url 'index' %}">Home</a></li>
-                    <li><a href="{% url 'services' %}" class="active">Services</a></li>
-                    <li><a href="{% url 'booking' %}">Book Now</a></li>
-                </ul>
-            </div>
-            <a href="{% url 'index' %}" class="btn btn-ghost text-xl font-bold">🚗 iWashCars</a>
-        </div>
-        <div class="navbar-center hidden lg:flex">
-            <ul class="menu menu-horizontal px-1">
-                <li><a href="{% url 'index' %}" class="hover:bg-primary-focus">Home</a></li>
-                <li><a href="{% url 'services' %}" class="hover:bg-primary-focus active">Services</a></li>
-                <li><a href="{% url 'booking' %}" class="hover:bg-primary-focus">Book Now</a></li>
-            </ul>
-        </div>
-        <div class="navbar-end">
-            <a href="{% url 'booking' %}" class="btn btn-secondary">Book Now</a>
-        </div>
-    </div>
+
+{% block title %}iWashCars - Premium Mobile Car Wash Service{% endblock %}
+
+{% block content %}
 
     <!-- Hero Section -->
     <div class="hero min-h-[60vh] bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white relative overflow-hidden">
@@ -79,18 +34,6 @@
 
     <!-- Services Gallery -->
     {% for vehicle_type, services in services_by_vehicle.items %}
-    <!-- Vehicle Type Divider -->
-    <div class="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 py-12">
-        <div class="container mx-auto px-4 text-center">
-            <div class="inline-flex items-center gap-4 bg-primary text-primary-content px-8 py-3 rounded-full shadow-lg">
-                <div class="text-2xl">🚗</div>
-                <h2 class="text-3xl font-bold">{{ vehicle_type.name }}</h2>
-            </div>
-            {% if vehicle_type.description %}
-            <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">{{ vehicle_type.description }}</p>
-            {% endif %}
-        </div>
-    </div>
 
     <!-- Service Presentations -->
     {% for service in services %}
@@ -310,67 +253,4 @@
         </div>
     </div>
 
-    <!-- CTA Section -->
-    <div class="hero min-h-[50vh] bg-gradient-to-r from-secondary via-accent to-secondary text-white relative overflow-hidden">
-        <div class="absolute inset-0 bg-black/10"></div>
-        <div class="hero-content text-center z-10">
-            <div class="max-w-3xl">
-                <h2 class="text-5xl md:text-6xl font-bold mb-6 drop-shadow-lg">Ready to Get Started?</h2>
-                <p class="text-2xl mb-10 drop-shadow">
-                    Book your mobile car wash today and experience the convenience of professional service at your location.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-6 justify-center">
-                    <a href="{% url 'booking' %}" class="btn btn-primary btn-lg text-xl px-10">
-                        <svg class="w-6 h-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        Book Now
-                    </a>
-                    <a href="{% url 'index' %}" class="btn btn-outline btn-lg text-xl px-10 text-white border-white hover:bg-white hover:text-secondary">
-                        <svg class="w-6 h-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                        </svg>
-                        Back to Home
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer footer-center p-10 bg-base-200 text-base-content">
-        <nav class="grid grid-flow-col gap-4">
-            <a href="{% url 'index' %}" class="link link-hover">Home</a>
-            <a href="{% url 'services' %}" class="link link-hover">Services</a>
-            <a href="{% url 'booking' %}" class="link link-hover">Book Now</a>
-            <a class="link link-hover">Privacy Policy</a>
-        </nav>
-        <nav>
-            <div class="grid grid-flow-col gap-4">
-                <a class="text-2xl hover:text-primary cursor-pointer">📧</a>
-                <a class="text-2xl hover:text-primary cursor-pointer">📱</a>
-                <a class="text-2xl hover:text-primary cursor-pointer">📍</a>
-            </div>
-        </nav>
-        <aside>
-            <p class="font-bold text-xl">🚗 iWashCars</p>
-            <p>Professional Mobile Car Wash & Detailing</p>
-            <p>Copyright © 2024 - All rights reserved</p>
-            <p class="text-sm opacity-70">📞 (555) 123-WASH | 📧 info@iwashcars.com</p>
-        </aside>
-    </footer>
-
-    <!-- Smooth Scroll -->
-    <script>
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+{% endblock %}

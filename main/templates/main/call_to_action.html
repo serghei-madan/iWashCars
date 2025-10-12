@@ -1,0 +1,18 @@
+{% load static %}
+
+<!-- CTA Section -->
+<div class="hero bg-gradient-to-r from-secondary to-accent">
+    <div class="overlay bg-black/90 w-full h-full"></div>
+    <div class="py-16">
+        <div class="hero-content text-center text-white">
+            <div class="max-w-md">
+                <h2 class="text-4xl font-bold mb-5">Ready to Get Started?</h2>
+                <p class="text-lg mb-8">Book your mobile car wash today and experience the convenience of professional service at your location.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'booking' %}" class="btn btn-primary btn-lg">Book Now</a>
+                    <a href="{% url 'booking' %}" class="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-secondary">Get Quote</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

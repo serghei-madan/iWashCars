@@ -1,36 +1,14 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Your Car Wash - iWashCars</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://js.stripe.com/v3/"></script>
-    <link href="{% static 'css/output.css' %}" rel="stylesheet">
-</head>
-<body>
-    <!-- Navbar -->
-    <div class="navbar bg-primary text-primary-content">
-        <div class="navbar-start">
-            <a href="{% url 'index' %}" class="btn btn-ghost text-xl font-bold">🚗 iWashCars</a>
-        </div>
-        <div class="navbar-center hidden lg:flex">
-            <ul class="menu menu-horizontal px-1">
-                <li><a href="{% url 'index' %}" class="hover:bg-primary-focus">Home</a></li>
-                <li><a class="hover:bg-primary-focus bg-primary-focus">Book Now</a></li>
-            </ul>
-        </div>
-        <div class="navbar-end">
-            <a href="{% url 'index' %}" class="btn btn-secondary">Back to Home</a>
-        </div>
-    </div>
+
+{% block title %}iWashCars - Booking Carwash{% endblock %}
+
+{% block content %}
 
     <!-- Booking Form -->
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-8 hero bg-cover bg-center" style="background-image: url('{% static 'images/home_2.jpg' %}');">
         <div class="max-w-4xl mx-auto">
-            <h1 class="text-4xl font-bold text-center mb-8">Book Your Car Wash</h1>
+            <h1 class="text-4xl font-bold text-white text-center mb-8">Book Your Car Wash</h1>
 
             <!-- Messages -->
             {% if messages %}
@@ -44,7 +22,7 @@
                 {% endfor %}
             {% endif %}
 
-            <div class="card bg-base-100 shadow-xl">
+            <div class="card bg-base-100 shadow-xl text-white" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsl(0deg 0% 15.11% / 5.1%)">
                 <div class="card-body">
                     <form method="post" id="booking-form">
                         {% csrf_token %}
@@ -104,17 +82,6 @@
                                 </div>
 
                                 <h3 class="text-xl font-bold mb-4">Service Location</h3>
-
-                                <!-- Service Area Notice -->
-                                <!-- <div class="alert alert-info mb-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    <div>
-                                        <h4 class="font-bold">Service Area</h4>
-                                        <p class="text-sm">We serve addresses within 15 miles of North Hollywood, CA (ZIP: 91602)</p>
-                                    </div>
-                                </div> -->
 
                                 <div class="form-control mb-4">
                                     <label class="label">
@@ -271,6 +238,9 @@
             </div>
         </div>
     </div>
+    {% endblock %}
+
+    {% block end_js %}
 
     <script>
         // Stripe configuration
@@ -792,5 +762,4 @@
             updateButtonState();  // Initialize button state on page load
         }
     </script>
-</body>
-</html>
+{% endblock %}
