@@ -4,6 +4,9 @@
 # Set default PORT if not provided
 PORT=${PORT:-8000}
 
+echo "Running database migrations..."
+python manage.py migrate --noinput
+
 echo "Starting gunicorn on port ${PORT}..."
 
 # Run gunicorn with environment-based PORT

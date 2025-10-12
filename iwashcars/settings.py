@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-z-d=*8mm7vm!y@7^s$(%15knj#
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 # Parse ALLOWED_HOSTS from environment variable
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1' ,'.railway.app,yourdomain.com').split(',')
 
 # Add Railway domains
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if os.getenv('CSRF_TRUSTED_ORIGINS') else []
@@ -140,10 +140,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Source directories for static files
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+# Only use STATICFILES_DIRS if the static directory exists (development)
+if (BASE_DIR / "static").exists():
+    STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Enable WhiteNoise compression and caching
 STORAGES = {
