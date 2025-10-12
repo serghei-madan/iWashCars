@@ -1,0 +1,123 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html data-theme="light" class="h-full" lang="en">
+
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    
+    <!-- Primary SEO Meta Tags -->
+    <title>{% block title %}iWashCars - Premium Mobile Car Wash & Detailing Service{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Professional mobile car wash and detailing service in North Hollywood. We come to you! Eco-friendly products, experienced team, and unmatched convenience.{% endblock %}" />
+    <meta name="keywords" content="{% block meta_keywords %}mobile car wash, car detailing, car wash service, mobile detailing, eco-friendly car wash, North Hollywood car wash, premium car wash, on-demand car wash{% endblock %}" />
+    <meta name="author" content="iWashCars" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}" />
+
+    <!-- Open Graph / Facebook Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}" />
+    <meta property="og:title" content="{% block og_title %}{% block title_og %}iWashCars - Premium Mobile Car Wash & Detailing Service{% endblock %}{% endblock %}" />
+    <meta property="og:description" content="{% block og_description %}{% block description_og %}Professional mobile car wash and detailing service. We come to you! Eco-friendly products, experienced team, and unmatched convenience.{% endblock %}{% endblock %}" />
+    <meta property="og:image" content="{% block og_image %}{% static 'images/og-iwashcars.jpg' %}{% endblock %}" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="iWashCars" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:domain" content="{% block twitter_domain %}{{ request.get_host }}{% endblock %}" />
+    <meta property="twitter:url" content="{% block twitter_url %}{{ request.build_absolute_uri }}{% endblock %}" />
+    <meta name="twitter:title" content="{% block twitter_title %}{% block title_twitter %}iWashCars - Premium Mobile Car Wash & Detailing Service{% endblock %}{% endblock %}" />
+    <meta name="twitter:description" content="{% block twitter_description %}{% block description_twitter %}Professional mobile car wash and detailing service. We come to you! Eco-friendly products, experienced team.{% endblock %}{% endblock %}" />
+    <meta name="twitter:image" content="{% block twitter_image %}{% static 'images/og-iwashcars.jpg' %}{% endblock %}" />
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="distribution" content="global" />
+    <meta name="rating" content="general" />
+    
+    <!-- Schema.org Structured Data -->
+    {% block structured_data %}
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "LocalBusiness",
+                "name": "iWashCars",
+                "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/og-iwashcars.jpg' %}",
+                "@id": "{{ request.scheme }}://{{ request.get_host }}/",
+                "url": "{{ request.scheme }}://{{ request.get_host }}/",
+                "telephone": "",
+                "priceRange": "$$",
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "",
+                    "addressLocality": "North Hollywood",
+                    "addressRegion": "CA",
+                    "postalCode": "",
+                    "addressCountry": "US"
+                },
+                "geo": {
+                    "@type": "GeoCoordinates",
+                    "latitude": 34.1720,
+                    "longitude": -118.3792
+                },
+                "openingHoursSpecification": {
+                    "@type": "OpeningHoursSpecification",
+                    "dayOfWeek": [
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday",
+                        "Sunday"
+                    ],
+                    "opens": "08:00",
+                    "closes": "18:00"
+                },
+                "sameAs": []
+            }
+        </script>
+    {% endblock %}
+
+    {% block analytics %}
+    <!-- Add Google Analytics or other tracking scripts here -->
+    {% endblock %}
+
+    <!-- DaisyUI and Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js" defer></script>
+    <script src="https://unpkg.com/alpinejs@3.14.9/dist/cdn.min.js" defer></script>
+
+    {% comment %}
+    <!-- Add your favicon here -->
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" />
+    <link rel="icon" href="{% static 'images/favicon-32x32.png' %}" sizes="32x32" />
+    <link rel="icon" href="{% static 'images/favicon-192x192.png' %}" sizes="192x192" />
+    {% endcomment %}
+
+    {% block page_head %}{% endblock %}
+</head>
+
+<body class="min-h-screen flex flex-col">
+    {% include "main/header.html" %}
+
+    <main class="flex-1">
+        {% block content %}
+        {% endblock content %}
+    </main>
+
+    {% block base_js %}{% endblock %}
+    {% block end_js %}{% endblock %}
+    {% block bottom_css %}{% endblock %}
+
+    {% include "main/footer.html" %}
+</body>
+</html>

@@ -1,273 +1,282 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iWashCars - Premium Mobile Car Wash Service</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="{% static 'css/output.css' %}" rel="stylesheet">
-</head>
-<body>
-    <!-- Navbar -->
-    <div class="navbar bg-primary text-primary-content">
-        <div class="navbar-start">
-            <div class="dropdown">
-                <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
-                    </svg>
-                </div>
-                <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow text-base-content">
-                    <li><a href="{% url 'services' %}">Services</a></li>
-                    <li><a href="{% url 'services' %}">Pricing</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </div>
-            <a class="btn btn-ghost text-xl font-bold">🚗 iWashCars</a>
-        </div>
-        <div class="navbar-center hidden lg:flex">
-            <ul class="menu menu-horizontal px-1">
-                <li><a href="{% url 'services' %}" class="hover:bg-primary-focus">Services</a></li>
-                <li><a href="{% url 'services' %}" class="hover:bg-primary-focus">Pricing</a></li>
-                <li><a href="#about" class="hover:bg-primary-focus">About</a></li>
-                <li><a href="#contact" class="hover:bg-primary-focus">Contact</a></li>
-            </ul>
-        </div>
-        <div class="navbar-end">
-            <a href="{% url 'booking' %}" class="btn btn-secondary">Book Now</a>
+
+{% block title %}iWashCars - Premium Mobile Car Wash Service{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero min-h-screen bg-cover bg-center" style="background-image: url('{% static 'images/home_1.png' %}');">
+    <div class="hero-content text-center text-white z-10 p-6">
+        <div class="max-w-md rounded-lg border border-white/20 bg-black/40 backdrop-blur-sm p-8">
+            <h1 class="text-4xl font-bold mb-5">Premium Mobile <br/> Car Wash</h1>
+            <p class="text-md mb-5">We come to you! Professional car washing service at your doorstep. Eco-friendly products, experienced team, and unmatched convenience.</p>
+            <a href="{% url 'booking' %}" class="btn btn-primary">Book Your Wash</a>
         </div>
     </div>
+</div>
 
-    <!-- Hero Section -->
-    <div class="hero min-h-screen bg-gradient-to-r from-blue-500 to-blue-700">
-        <div class="hero-content text-center text-white">
-            <div class="max-w-md">
-                <h1 class="text-5xl font-bold mb-5">Premium Mobile Car Wash</h1>
-                <p class="text-xl mb-5">We come to you! Professional car washing service at your doorstep. Eco-friendly products, experienced team, and unmatched convenience.</p>
-                <a href="{% url 'booking' %}" class="btn btn-secondary btn-lg">Book Your Wash</a>
-            </div>
+<!-- About Section -->
+<div id="about" class="py-20 bg-black text-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2 class="text-5xl font-bold mb-6">About iWashCars</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Your trusted partner for premium mobile car wash and detailing services
+            </p>
         </div>
-    </div>
 
-    <!-- Services Section -->
-    <div class="py-16 bg-base-100">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12">Our Services</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {% for service in services %}
-                <div class="card bg-base-200 shadow-xl{% if service.tier == 'premium' %} border-2 border-secondary{% endif %}">
-                    {% if service.tier == 'premium' %}
-                    <div class="badge badge-secondary absolute top-4 right-4">Popular</div>
-                    {% endif %}
-                    <div class="card-body text-center">
-                        <div class="text-4xl mb-4">
-                            {% if service.tier == 'basic' %}🧽
-                            {% elif service.tier == 'premium' %}✨
-                            {% elif service.tier == 'deluxe' %}👑
-                            {% endif %}
-                        </div>
-                        <h3 class="card-title justify-center">{{ service.name }}</h3>
-                        <p>{{ service.description|truncatewords:10 }}</p>
-                        <div class="text-2xl font-bold text-primary mt-4">${{ service.price }}</div>
-                        <div class="text-sm text-base-content opacity-70 mb-4">{{ service.get_duration_display }}</div>
-                        <div class="card-actions justify-center mt-4">
-                            <a href="{% url 'booking' %}" class="btn {% if service.tier == 'premium' %}btn-secondary{% else %}btn-primary{% endif %}">Choose {{ service.tier|title }}</a>
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="col-span-3 text-center">
-                    <p class="text-xl text-gray-600">No services available at the moment.</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Features Section -->
-    <div class="py-16 bg-base-200">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12">Why Choose iWashCars?</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="text-center">
-                    <div class="text-5xl mb-4">📱</div>
-                    <h3 class="text-xl font-bold mb-2">Easy Booking</h3>
-                    <p>Book online or via mobile app in just a few clicks</p>
-                </div>
-                <div class="text-center">
-                    <div class="text-5xl mb-4">🌿</div>
-                    <h3 class="text-xl font-bold mb-2">Eco-Friendly</h3>
-                    <p>Biodegradable products and water-saving techniques</p>
-                </div>
-                <div class="text-center">
-                    <div class="text-5xl mb-4">⚡</div>
-                    <h3 class="text-xl font-bold mb-2">Fast Service</h3>
-                    <p>Professional wash completed in 30-45 minutes</p>
-                </div>
-                <div class="text-center">
-                    <div class="text-5xl mb-4">💯</div>
-                    <h3 class="text-xl font-bold mb-2">Satisfaction Guaranteed</h3>
-                    <p>100% satisfaction guarantee or we'll re-wash for free</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Testimonials -->
-    <div class="py-16 bg-base-100">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12">What Our Customers Say</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="card bg-base-200 shadow-xl">
-                    <div class="card-body">
-                        <div class="rating mb-4">
-                            <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
-                        </div>
-                        <p>"Amazing service! They came right to my office and my car looked brand new. Highly recommended!"</p>
-                        <div class="mt-4">
-                            <p class="font-bold">- Sarah M.</p>
-                            <p class="text-sm opacity-70">Regular Customer</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card bg-base-200 shadow-xl">
-                    <div class="card-body">
-                        <div class="rating mb-4">
-                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
-                        </div>
-                        <p>"Professional, punctual, and affordable. The deluxe wash made my car shine like never before!"</p>
-                        <div class="mt-4">
-                            <p class="font-bold">- Mike R.</p>
-                            <p class="text-sm opacity-70">Business Owner</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card bg-base-200 shadow-xl">
-                    <div class="card-body">
-                        <div class="rating mb-4">
-                            <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
-                            <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
-                        </div>
-                        <p>"Convenient booking, great communication, and excellent results. I'm a customer for life!"</p>
-                        <div class="mt-4">
-                            <p class="font-bold">- Jennifer L.</p>
-                            <p class="text-sm opacity-70">Marketing Manager</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- About Section -->
-    <div id="about" class="py-20 bg-gradient-to-b from-base-200 to-base-100">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-5xl font-bold mb-6">About iWashCars</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Your trusted partner for premium mobile car wash and detailing services
+        <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
+            <!-- Our Story -->
+            <div class="space-y-6">
+                <div class="badge badge-primary badge-lg">Our Story</div>
+                <h3 class="text-4xl font-bold">We Bring The Car Wash To You</h3>
+                <p class="text-lg text-gray-600 leading-relaxed">
+                    Founded in North Hollywood, iWashCars was born from a simple idea: car care should be convenient, professional, and eco-friendly. We understand that your time is valuable, which is why we bring our premium services directly to your location.
                 </p>
-            </div>
-
-            <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
-                <!-- Our Story -->
-                <div class="space-y-6">
-                    <div class="badge badge-primary badge-lg">Our Story</div>
-                    <h3 class="text-4xl font-bold">We Bring The Car Wash To You</h3>
-                    <p class="text-lg text-gray-600 leading-relaxed">
-                        Founded in North Hollywood, iWashCars was born from a simple idea: car care should be convenient, professional, and eco-friendly. We understand that your time is valuable, which is why we bring our premium services directly to your location.
-                    </p>
-                    <p class="text-lg text-gray-600 leading-relaxed">
-                        Our team of experienced professionals uses only the highest quality, biodegradable products and advanced water-saving techniques to ensure your vehicle gets the care it deserves while protecting our environment.
-                    </p>
-                    <div class="stats shadow bg-base-100">
-                        <div class="stat">
-                            <div class="stat-figure text-primary">
-                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                            </div>
-                            <div class="stat-title">Happy Customers</div>
-                            <div class="stat-value text-primary">1000+</div>
+                <p class="text-lg text-gray-600 leading-relaxed">
+                    Our team of experienced professionals uses only the highest quality, biodegradable products and advanced water-saving techniques to ensure your vehicle gets the care it deserves while protecting our environment.
+                </p>
+                <div class="stats shadow" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                    <div class="stat">
+                        <div class="stat-figure text-primary">
+                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
                         </div>
-                        <div class="stat">
-                            <div class="stat-figure text-secondary">
-                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                                </svg>
-                            </div>
-                            <div class="stat-title">Years in Business</div>
-                            <div class="stat-value text-secondary">5+</div>
-                        </div>
+                        <div class="stat-title">Happy Customers</div>
+                        <div class="stat-value text-primary">1000+</div>
                     </div>
-                </div>
-
-                <!-- Image/Visual Element -->
-                <div class="relative">
-                    <div class="rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-blue-500 to-blue-700 h-96 flex items-center justify-center">
-                        <div class="text-center text-white p-8">
-                            <div class="text-8xl mb-6">🚗✨</div>
-                            <h4 class="text-3xl font-bold mb-4">Professional Mobile Service</h4>
-                            <p class="text-xl">Serving North Hollywood & Surrounding Areas</p>
+                    <div class="stat">
+                        <div class="stat-figure text-secondary">
+                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                            </svg>
                         </div>
+                        <div class="stat-title">Years in Business</div>
+                        <div class="stat-value text-secondary">5+</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Our Values -->
-            <div class="text-center mb-12">
-                <h3 class="text-4xl font-bold mb-8">Our Values</h3>
+        </div>
+    </div>
+</div>
+
+
+<!-- Services Section -->
+<div class="py-20 bg-black bg-contain bg-left" style="background-image: url('{% static 'images/home_2.jpg' %}');">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl text-white font-bold text-center mb-12">Our Services</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Basic Wash Card -->
+             <div class="flex justify-center">
+                 <div class="card w-80 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                     <div class="card-body">
+                         <div class="flex justify-between">
+                             <h2 class="text-3xl font-bold">Basic</h2>
+                             <span class="text-xl">$50</span>
+                         </div>
+                         <ul class="mt-6 flex flex-col gap-2 text-xs">
+                             <li>
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                 <span>High-resolution image generation</span>
+                             </li>
+                             <li>
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                 <span>Customizable style templates</span>
+                             </li>
+                             <li>
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                 <span>Batch processing capabilities</span>
+                             </li>
+                             <li>
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                 <span>AI-driven image enhancements</span>
+                             </li>
+                             <li class="opacity-50">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                 <span class="line-through">Seamless cloud integration</span>
+                             </li>
+                             <li class="opacity-50">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                 <span class="line-through">Real-time collaboration tools</span>
+                             </li>
+                         </ul>
+                         <div class="flex justify-between mt-6">
+                             <button class="btn btn-primary">Book Your Wash</button>
+                             <button class="btn btn-outline text-white">View Details</button>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+            <!-- Deluxe Wash Card -->
+            <div class="flex justify-center">
+                <div class="card w-96 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                    <div class="card-body">
+                        <div class="flex justify-between">
+                            <h2 class="text-3xl font-bold">Deluxe</h2>
+                            <span class="text-xl">$150</span>
+                        </div>
+                        <ul class="mt-6 flex flex-col gap-2 text-xs">
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>High-resolution image generation</span>
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>Customizable style templates</span>
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>High-resolution image generation</span>
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>Batch processing capabilities</span>
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>High-resolution image generation</span>
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>High-resolution image generation</span>
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>AI-driven image enhancements</span>
+                            </li>
+                            <li class="opacity-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span class="line-through">Seamless cloud integration</span>
+                            </li>
+                            <li class="opacity-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span class="line-through">Real-time collaboration tools</span>
+                            </li>
+                        </ul>
+                        <div class="flex justify-between mt-6">
+                            <button class="btn btn-primary">Book Your Wash</button>
+                            <button class="btn btn-outline text-white">View Details</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-                    <div class="card-body items-center text-center">
-                        <div class="text-5xl mb-4">🌟</div>
-                        <h4 class="card-title text-2xl">Quality First</h4>
-                        <p class="text-gray-600">
-                            We never compromise on the quality of our work. Every vehicle receives our full attention and care, using only premium products.
-                        </p>
-                    </div>
-                </div>
-                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-                    <div class="card-body items-center text-center">
-                        <div class="text-5xl mb-4">🌍</div>
-                        <h4 class="card-title text-2xl">Eco-Conscious</h4>
-                        <p class="text-gray-600">
-                            Environmental responsibility is at our core. We use biodegradable products and water-efficient techniques.
-                        </p>
-                    </div>
-                </div>
-                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-                    <div class="card-body items-center text-center">
-                        <div class="text-5xl mb-4">🤝</div>
-                        <h4 class="card-title text-2xl">Customer Focused</h4>
-                        <p class="text-gray-600">
-                            Your satisfaction is our priority. We're committed to providing exceptional service and building lasting relationships.
-                        </p>
+            <!-- Premium Wash Card -->
+            <div class="flex justify-center">
+                <div class="card w-80 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                    <div class="card-body">
+                        <span class="badge badge-xs badge-warning">Most Popular</span>
+                        <div class="flex justify-between">
+                            <h2 class="text-3xl font-bold">Premium</h2>
+                            <span class="text-xl">$50</span>
+                        </div>
+                        <ul class="mt-6 flex flex-col gap-2 text-xs">
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>High-resolution image generation</span>
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>Customizable style templates</span>
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>Batch processing capabilities</span>
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>AI-driven image enhancements</span>
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span>High-resolution image generation</span>
+                            </li>
+                            <li class="opacity-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span class="line-through">Seamless cloud integration</span>
+                            </li>
+                            <li class="opacity-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 me-2 inline-block text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <span class="line-through">Real-time collaboration tools</span>
+                            </li>
+                        </ul>
+                        <div class="flex justify-between mt-6">
+                            <button class="btn btn-primary">Book Your Wash</button>
+                            <button class="btn btn-outline text-white">View Details</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- CTA Section -->
-    <div class="hero py-16 bg-gradient-to-r from-secondary to-accent">
+<!-- Testimonials -->
+<div class="py-16 bg-black text-white">
+
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12">What Our Customers Say</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="card shadow-xl">
+                <div class="card-body">
+                    <div class="rating mb-4">
+                        <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                    </div>
+                    <p>"Amazing service! They came right to my office and my car looked brand new. Highly recommended!"</p>
+                    <div class="mt-4">
+                        <p class="font-bold">- Sarah M.</p>
+                        <p class="text-sm opacity-70">Regular Customer</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-xl">
+                <div class="card-body">
+                    <div class="rating mb-4">
+                        <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                    </div>
+                    <p>"Professional, punctual, and affordable. The deluxe wash made my car shine like never before!"</p>
+                    <div class="mt-4">
+                        <p class="font-bold">- Mike R.</p>
+                        <p class="text-sm opacity-70">Business Owner</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-xl">
+                <div class="card-body">
+                    <div class="rating mb-4">
+                        <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                        <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                    </div>
+                    <p>"Convenient booking, great communication, and excellent results. I'm a customer for life!"</p>
+                    <div class="mt-4">
+                        <p class="font-bold">- Jennifer L.</p>
+                        <p class="text-sm opacity-70">Marketing Manager</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- CTA Section -->
+<div class="hero bg-gradient-to-r from-secondary to-accent">
+    <div class="overlay bg-black/80 w-full h-full"></div>
+    <div class="py-16">
         <div class="hero-content text-center text-white">
             <div class="max-w-md">
                 <h2 class="text-4xl font-bold mb-5">Ready to Get Started?</h2>
@@ -279,52 +288,33 @@
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Footer -->
-    <footer id="contact" class="footer footer-center p-10 bg-base-200 text-base-content">
-        <nav class="grid grid-flow-col gap-4">
-            <a href="#about" class="link link-hover">About us</a>
-            <a href="#contact" class="link link-hover">Contact</a>
-            <a href="{% url 'services' %}" class="link link-hover">Services</a>
-            <a class="link link-hover">Privacy Policy</a>
-        </nav>
-        <nav>
-            <div class="grid grid-flow-col gap-4">
-                <a class="text-2xl hover:text-primary">📧</a>
-                <a class="text-2xl hover:text-primary">📱</a>
-                <a class="text-2xl hover:text-primary">📍</a>
-            </div>
-        </nav>
-        <aside>
-            <p>Copyright © 2024 - All rights reserved by iWashCars</p>
-            <p class="text-sm opacity-70">📞 (555) 123-WASH | 📧 info@iwashcars.com</p>
-        </aside>
-    </footer>
+{% block end_js %}
+<!-- Smooth Scroll Script -->
+<script>
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
 
-    <!-- Smooth Scroll Script -->
-    <script>
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
 
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-
-                    // Close mobile menu if open
-                    const activeElement = document.activeElement;
-                    if (activeElement) {
-                        activeElement.blur();
-                    }
+                // Close mobile menu if open
+                const activeElement = document.activeElement;
+                if (activeElement) {
+                    activeElement.blur();
                 }
-            });
+            }
         });
-    </script>
-</body>
-</html>
+    });
+</script>
+{% endblock %}
