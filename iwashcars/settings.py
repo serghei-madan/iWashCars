@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-z-d=*8mm7vm!y@7^s$(%15knj#
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 # Parse ALLOWED_HOSTS from environment variable
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1' ,'.railway.app,yourdomain.com').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.railway.app').split(',')
 
 # Add Railway domains
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if os.getenv('CSRF_TRUSTED_ORIGINS') else []
