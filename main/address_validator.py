@@ -31,8 +31,11 @@ def geocode_address(address, city, zip_code):
         tuple: (latitude, longitude) or None if geocoding fails
     """
     try:
+        # Clean up the address - replace newlines with spaces and normalize whitespace
+        clean_address = ' '.join(address.split())
+
         # Build full address string
-        full_address = f"{address}, {city}, {zip_code}, USA"
+        full_address = f"{clean_address}, {city}, {zip_code}, USA"
 
         logger.info(f"Geocoding address: {full_address}")
         location = geolocator.geocode(full_address)

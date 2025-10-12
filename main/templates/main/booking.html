@@ -4,6 +4,9 @@
 {% block title %}iWashCars - Booking Carwash{% endblock %}
 
 {% block page_head %}
+<!-- Load Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+
 <style>
     /* Input field styling */
     #booking-form input[type="text"],
@@ -13,6 +16,7 @@
     #booking-form input[type="time"],
     #booking-form select,
     #booking-form textarea,
+    #service-details,
     .available-spots {
         color: #ffffff !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
