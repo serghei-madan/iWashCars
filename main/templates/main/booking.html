@@ -3,6 +3,84 @@
 
 {% block title %}iWashCars - Booking Carwash{% endblock %}
 
+{% block page_head %}
+<style>
+    /* Input field styling */
+    #booking-form input[type="text"],
+    #booking-form input[type="email"],
+    #booking-form input[type="tel"],
+    #booking-form input[type="date"],
+    #booking-form input[type="time"],
+    #booking-form select,
+    #booking-form textarea,
+    .available-spots {
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        backdrop-filter: blur(4px) !important;
+        background-color: hsl(0deg 0% 15.11% / 5.1%) !important;
+    }
+
+    /* Placeholder text */
+    #booking-form input::placeholder,
+    #booking-form textarea::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    /* Label text */
+    #booking-form .label-text,
+    #booking-form .label-text-alt {
+        color: #ffffff !important;
+    }
+
+    /* Select dropdown options */
+    #booking-form select option {
+        background-color: #000000;
+        color: #ffffff;
+    }
+
+    /* Focus states */
+    #booking-form input:focus,
+    #booking-form select:focus,
+    #booking-form textarea:focus {
+        outline: none;
+        border-color: rgba(212, 175, 55, 0.5) !important;
+        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+    }
+
+    /* Disabled inputs */
+    #booking-form input:disabled,
+    #booking-form select:disabled {
+        background-color: #1a1a1a !important;
+        color: rgba(255, 255, 255, 0.5) !important;
+        cursor: not-allowed;
+    }
+
+    /* Autofill styling - override browser defaults */
+    #booking-form input:-webkit-autofill,
+    #booking-form input:-webkit-autofill:hover,
+    #booking-form input:-webkit-autofill:focus,
+    #booking-form select:-webkit-autofill,
+    #booking-form select:-webkit-autofill:hover,
+    #booking-form select:-webkit-autofill:focus,
+    #booking-form textarea:-webkit-autofill,
+    #booking-form textarea:-webkit-autofill:hover,
+    #booking-form textarea:-webkit-autofill:focus  {
+        -webkit-text-fill-color: #ffffff !important;
+        -webkit-box-shadow: 0 0 0px 1000px hsl(0deg 0% 15.11% / 5.1%) inset !important;
+        box-shadow: 0 0 0px 1000px hsl(0deg 0% 15.11% / 5.1%) inset !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+    /* Date and time picker calendar/clock icons - make them white */
+    #booking-form input[type="date"]::-webkit-calendar-picker-indicator,
+    #booking-form input[type="time"]::-webkit-calendar-picker-indicator {
+        filter: invert(1) brightness(100%);
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 
     <!-- Booking Form -->
@@ -196,9 +274,9 @@
                                 </div>
 
                                 <!-- Available Time Slots Display -->
-                                <div class="bg-base-200 p-4 rounded-lg mb-6">
+                                <div class="p-4 rounded-lg mb-6 border available-spots">
                                     <h4 class="font-bold mb-2">Available Time Slots</h4>
-                                    <div id="time-slots" class="text-sm text-base-content">
+                                    <div id="time-slots" class="text-sm">
                                         Select a date to see available time slots
                                     </div>
                                 </div>

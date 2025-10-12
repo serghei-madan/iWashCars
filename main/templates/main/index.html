@@ -3,27 +3,151 @@
 
 {% block title %}iWashCars - Services{% endblock %}
 
+{% block page_head %}
+<style>
+    /* Service card hover effects */
+    .card {
+        transition: all 0.3s ease-in-out;
+        border: 2px solid transparent;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+        border-color: #D4AF37;
+        outline: solid 1px #4a00ff;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section -->
 <div class="hero min-h-screen bg-cover bg-center" style="background-image: url('{% static 'images/home_1.png' %}');">
     <div class="hero-content text-center text-white z-10 p-6">
-        <div class="max-w-md rounded-lg border border-white/20 bg-black/40 backdrop-blur-sm p-8">
+        <div class="max-w-lg rounded-lg border border-white/20 bg-black/40 backdrop-blur-sm p-8">
             <h1 class="text-4xl font-bold mb-5">Premium Mobile <br/> Car Wash</h1>
             <p class="text-md mb-5">We come to you! Professional car washing service at your doorstep. Eco-friendly products, experienced team, and unmatched convenience.</p>
-            <a href="{% url 'booking' %}" class="btn btn-primary">Book Your Wash</a>
+            <div>
+                <a href="{% url 'booking' %}" class="btn btn-primary">Book Your Wash</a>
+                <a href="{% url 'services' %}" class="btn btn-outline text-white">Learn More</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gallery Section -->
+<div class="py-20">
+    <div class="container mx-auto px-4 text-white">
+        <div class="text-center mb-12">
+            <h2 class="text-5xl font-bold mb-4">Our Work Gallery</h2>
+            <p class="text-xl">See the results of our professional car wash services</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <!-- Gallery Item 1 -->
+            <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer">
+                <img src="{% static 'images/gallery_1.jpg' %}"
+                     alt="Exterior Detailing"
+                     class="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end">
+                    <h3 class="text-3xl font-bold text-white p-6">Exterior Detailing</h3>
+                </div>
+            </div>
+
+            <!-- Gallery Item 2 -->
+            <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer">
+                <img src="{% static 'images/gallery_2.jpg' %}"
+                     alt="Interior Cleaning"
+                     class="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end">
+                    <h3 class="text-3xl font-bold text-white p-6">Interior Cleaning</h3>
+                </div>
+            </div>
+
+            <!-- Gallery Item 3 -->
+            <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer">
+                <img src="{% static 'images/gallery_3.jpg' %}"
+                     alt="Premium Wax & Polish"
+                     class="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end">
+                    <h3 class="text-3xl font-bold text-white p-6">Premium Wax & Polish</h3>
+                </div>
+            </div>
+
+            <!-- Gallery Item 4 -->
+            <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer">
+                <img src="{% static 'images/gallery_4.jpg' %}"
+                     alt="Engine Bay Cleaning"
+                     class="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end">
+                    <h3 class="text-3xl font-bold text-white p-6">Engine Bay Cleaning</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- About Section -->
+<div id="about" class="py-12 mt-12 bg-black text-white bg-fixed bg-contain bg-no-repeat bg-center" style="background-image: url('{% static 'images/home_2.jpg' %}');">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2 class="text-5xl font-bold mb-6">About iWashCars</h2>
+            <p class="text-xl max-w-xl mx-auto">
+                Your trusted partner for premium mobile car wash and detailing services
+            </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
+            <!-- Our Story -->
+            <div class="space-y-6">
+                <div class="badge badge-primary badge-lg">Our Story</div>
+                <h3 class="text-3xl font-bold">We Bring The Car Wash To You</h3>
+                <p class="text-base leading-relaxed">
+                    Founded in North Hollywood, iWashCars was born from a simple idea: car care should be convenient, professional, and eco-friendly. We understand that your time is valuable, which is why we bring our premium services directly to your location.
+                </p>
+                <p class="text-base leading-relaxed">
+                    Our team of experienced professionals uses only the highest quality, biodegradable products and advanced water-saving techniques to ensure your vehicle gets the care it deserves while protecting our environment.
+                </p>
+                <div class="stats shadow" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                    <div class="stat">
+                        <div class="stat-figure text-primary">
+                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <div class="stat-title">Happy Customers</div>
+                        <div class="stat-value text-primary">1000+</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-figure text-secondary">
+                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                            </svg>
+                        </div>
+                        <div class="stat-title">Years in Business</div>
+                        <div class="stat-value text-secondary">5+</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image -->
+            <div class="flex items-center justify-center">
+                <div class="rounded-lg overflow-hidden shadow-2xl">
+                    <img src="{% static 'images/home_3.jpg' %}" alt="iWashCars professional car wash service" class="w-full h-auto object-cover aspect-square">
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Services Section -->
-<div class="py-12 mt-12 bg-black bg-fixed bg-contain bg-no-repeat bg-center" style="background-image: url('{% static 'images/home_2.jpg' %}');">
+<div class="py-20 bg-black bg-fixed bg-contain bg-no-repeat bg-center" style="background-image: url('{% static 'images/home_2.jpg' %}');">
     <div class="container mx-auto px-4">
         <h2 class="text-4xl text-white font-bold text-center mb-12">Our Services</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="block md:flex justify-center gap-8">
             <!-- Basic Wash Card -->
-             <div class="flex justify-center">
-                 <div class="card w-80 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
-                     <div class="card-body">
+            <div class="flex justify-center">
+                <div class="card w-80 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                     <div class="card-body justify-around">
                          <div class="flex justify-between">
                              <h2 class="text-3xl font-bold">Basic</h2>
                              <span class="text-xl">$50</span>
@@ -59,12 +183,12 @@
                              <button class="btn btn-outline text-white">View Details</button>
                          </div>
                      </div>
-                 </div>
-             </div>
+                </div>
+            </div>
             <!-- Deluxe Wash Card -->
             <div class="flex justify-center">
                 <div class="card w-96 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
-                    <div class="card-body">
+                    <div class="card-body justify-around">
                         <div class="flex justify-between">
                             <h2 class="text-3xl font-bold">Deluxe</h2>
                             <span class="text-xl">$150</span>
@@ -117,7 +241,7 @@
             <!-- Premium Wash Card -->
             <div class="flex justify-center">
                 <div class="card w-80 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
-                    <div class="card-body">
+                    <div class="card-body justify-around">
                         <span class="badge badge-xs badge-warning">Most Popular</span>
                         <div class="flex justify-between">
                             <h2 class="text-3xl font-bold">Premium</h2>
@@ -160,53 +284,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- About Section -->
-<div id="about" class="py-20 bg-black text-white bg-fixed bg-contain bg-no-repeat bg-center" style="background-image: url('{% static 'images/home_2.jpg' %}');">
-    <div class="container mx-auto px-4">
-        <div class="text-center mb-16">
-            <h2 class="text-5xl font-bold mb-6">About iWashCars</h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Your trusted partner for premium mobile car wash and detailing services
-            </p>
-        </div>
-
-        <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
-            <!-- Our Story -->
-            <div class="space-y-6">
-                <div class="badge badge-primary badge-lg">Our Story</div>
-                <h3 class="text-4xl font-bold">We Bring The Car Wash To You</h3>
-                <p class="text-lg text-gray-600 leading-relaxed">
-                    Founded in North Hollywood, iWashCars was born from a simple idea: car care should be convenient, professional, and eco-friendly. We understand that your time is valuable, which is why we bring our premium services directly to your location.
-                </p>
-                <p class="text-lg text-gray-600 leading-relaxed">
-                    Our team of experienced professionals uses only the highest quality, biodegradable products and advanced water-saving techniques to ensure your vehicle gets the care it deserves while protecting our environment.
-                </p>
-                <div class="stats shadow" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
-                    <div class="stat">
-                        <div class="stat-figure text-primary">
-                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </div>
-                        <div class="stat-title">Happy Customers</div>
-                        <div class="stat-value text-primary">1000+</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-figure text-secondary">
-                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                            </svg>
-                        </div>
-                        <div class="stat-title">Years in Business</div>
-                        <div class="stat-value text-secondary">5+</div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 </div>
@@ -269,8 +346,6 @@
         </div>
     </div>
 </div>
-
-{% include "main/call_to_action.html" %}
 
 {% endblock %}
 
