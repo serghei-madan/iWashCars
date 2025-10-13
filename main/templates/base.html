@@ -23,7 +23,7 @@
     <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}" />
     <meta property="og:title" content="{% block og_title %}{% block title_og %}iWashCars - Premium Mobile Car Wash & Detailing Service{% endblock %}{% endblock %}" />
     <meta property="og:description" content="{% block og_description %}{% block description_og %}Professional mobile car wash and detailing service. We come to you! Eco-friendly products, experienced team, and unmatched convenience.{% endblock %}{% endblock %}" />
-    <meta property="og:image" content="{% block og_image %}{% static 'images/og-iwashcars.jpg' %}{% endblock %}" />
+    <meta property="og:image" content="{% block og_image %}{% static 'images/logo.png' %}{% endblock %}" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="iWashCars" />
 
@@ -33,7 +33,7 @@
     <meta property="twitter:url" content="{% block twitter_url %}{{ request.build_absolute_uri }}{% endblock %}" />
     <meta name="twitter:title" content="{% block twitter_title %}{% block title_twitter %}iWashCars - Premium Mobile Car Wash & Detailing Service{% endblock %}{% endblock %}" />
     <meta name="twitter:description" content="{% block twitter_description %}{% block description_twitter %}Professional mobile car wash and detailing service. We come to you! Eco-friendly products, experienced team.{% endblock %}{% endblock %}" />
-    <meta name="twitter:image" content="{% block twitter_image %}{% static 'images/og-iwashcars.jpg' %}{% endblock %}" />
+    <meta name="twitter:image" content="{% block twitter_image %}{% static 'images/logo.png' %}{% endblock %}" />
     
     <!-- Additional SEO Meta Tags -->
     <meta name="language" content="English" />
@@ -48,7 +48,7 @@
                 "@context": "https://schema.org",
                 "@type": "LocalBusiness",
                 "name": "iWashCars",
-                "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/og-iwashcars.jpg' %}",
+                "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}",
                 "@id": "{{ request.scheme }}://{{ request.get_host }}/",
                 "url": "{{ request.scheme }}://{{ request.get_host }}/",
                 "telephone": "",
