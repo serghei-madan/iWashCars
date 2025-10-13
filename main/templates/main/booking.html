@@ -82,6 +82,33 @@
         filter: invert(1) brightness(100%);
         cursor: pointer;
     }
+
+    /* Submit button styling */
+    #submit-booking {
+        background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
+        border: 2px solid #D4AF37;
+        color: #000000;
+        font-weight: 700;
+        font-size: 1.125rem;
+        padding: 1rem 2rem;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    #submit-booking:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6);
+        background: linear-gradient(135deg, #F4D03F 0%, #D4AF37 100%);
+    }
+
+    #submit-booking:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    #submit-booking:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 </style>
 {% endblock %}
 
@@ -240,9 +267,9 @@
                                 </div>
 
                                 <!-- Service Details Display -->
-                                <div id="service-details" class="bg-base-200 p-4 rounded-lg mb-6" style="display: none;">
+                                <div id="service-details" class="p-4 rounded-lg mb-6" style="display: none;">
                                     <h4 class="font-bold mb-2">Service Details</h4>
-                                    <div id="service-info" class="text-sm text-base-content">
+                                    <div id="service-info" class="text-sm">
                                         <!-- Service details will be populated by JavaScript -->
                                     </div>
                                     <a id="see-details-link" href="#" class="btn btn-link p-0" target="_blank" style="display: none;">
@@ -296,7 +323,7 @@
                                 <p class="text-lg">
                                     <span class="font-semibold text-primary" id="deposit-amount-display">Deposit Required: Select a service</span>
                                 </p>
-                                <p class="text-sm text-gray-600" id="deposit-description">
+                                <p class="text-sm" id="deposit-description">
                                     We'll charge a deposit now and collect the remaining amount after service completion.
                                 </p>
                             </div>
@@ -309,11 +336,14 @@
                             <div id="payment-messages" role="alert" style="display: none;" class="alert mb-4"></div>
                         </div>
 
-                        <div class="flex justify-center">
-                            <button type="submit" id="submit-booking" class="btn btn-primary btn-lg">
-                                📅 Book My Car Wash & Pay Deposit
+                        <div class="flex justify-center items-center gap-4">
+                            <button type="submit" id="submit-booking" class="btn btn-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Complete Booking & Pay Deposit
                             </button>
-                            <div id="payment-spinner" class="loading loading-spinner loading-lg text-primary ml-4" style="display: none;"></div>
+                            <div id="payment-spinner" class="loading loading-spinner loading-lg" style="display: none; color: #D4AF37;"></div>
                         </div>
                     </form>
                 </div>
@@ -615,33 +645,25 @@
             }
 
             const service = serviceData[selectedServiceId];
-            const duration = service.duration_minutes;
-            const hours = Math.floor(duration / 60);
-            const minutes = duration % 60;
-            const durationText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
 
             // Update deposit display
             const depositDollars = parseFloat(service.deposit_amount_dollars).toFixed(2);
             depositAmountDisplay.textContent = `Deposit Required: $${depositDollars}`;
             depositDescription.textContent = `We'll charge a $${depositDollars} deposit now and collect the remaining amount after service completion.`;
 
+            // Show only short description (truncate to first 150 characters)
+            const shortDescription = service.description.length > 150
+                ? service.description.substring(0, 150) + '...'
+                : service.description;
+
             serviceInfoDiv.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p><strong>Service:</strong> ${service.name}</p>
-                        <p><strong>Price:</strong> $${service.price}</p>
-                        <p><strong>Duration:</strong> ${durationText}</p>
-                    </div>
-                    <div>
-                        <p><strong>Description:</strong></p>
-                        <p class="text-sm">${service.description}</p>
-                    </div>
-                </div>
+                <p class="text-sm text-gray-300 mb-3">${shortDescription}</p>
             `;
 
             // Update the see details link
             seeDetailsLink.href = `/service/${selectedServiceId}/`;
             seeDetailsLink.style.display = 'inline-block';
+            seeDetailsLink.className = 'text-primary hover:text-primary-focus underline text-sm';
 
             serviceDetailsDiv.style.display = 'block';
         }

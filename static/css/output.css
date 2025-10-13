@@ -216,6 +216,9 @@
 .line-through {
   text-decoration-line: line-through;
 }
+.underline {
+  text-decoration-line: underline;
+}
 .opacity-50 {
   opacity: 50%;
 }
