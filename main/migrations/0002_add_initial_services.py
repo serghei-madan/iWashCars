@@ -4,68 +4,15 @@ from django.db import migrations
 
 
 def create_initial_services(apps, schema_editor):
-    Service = apps.get_model('main', 'Service')
-
-    services = [
-        {
-            'name': 'Basic Wash',
-            'tier': 'basic',
-            'description': 'Exterior wash, wheel cleaning, and drying. Perfect for a quick refresh.',
-            'price': 25.00,
-            'duration_minutes': 30,
-            'features': [
-                'Exterior hand wash',
-                'Wheel and tire cleaning',
-                'Windows cleaned',
-                'Hand dry with microfiber towels'
-            ],
-            'display_order': 1,
-            'is_active': True
-        },
-        {
-            'name': 'Premium Wash',
-            'tier': 'premium',
-            'description': 'Complete exterior and interior cleaning. Our most popular service.',
-            'price': 45.00,
-            'duration_minutes': 60,
-            'features': [
-                'Everything in Basic Wash',
-                'Interior vacuum',
-                'Dashboard and console cleaning',
-                'Door jambs cleaned',
-                'Air freshener',
-                'Tire dressing'
-            ],
-            'display_order': 2,
-            'is_active': True
-        },
-        {
-            'name': 'Deluxe Wash',
-            'tier': 'deluxe',
-            'description': 'Premium wash with wax protection and deep interior detailing.',
-            'price': 65.00,
-            'duration_minutes': 90,
-            'features': [
-                'Everything in Premium Wash',
-                'Hand wax application',
-                'Leather/upholstery conditioning',
-                'Complete interior detailing',
-                'Engine bay cleaning',
-                'Clay bar treatment',
-                'Paint sealant'
-            ],
-            'display_order': 3,
-            'is_active': True
-        }
-    ]
-
-    for service_data in services:
-        Service.objects.create(**service_data)
+    # This migration is deprecated and replaced by 0015_update_service_prices_and_structure
+    # Keeping this as a no-op to maintain migration history
+    pass
 
 
 def remove_initial_services(apps, schema_editor):
-    Service = apps.get_model('main', 'Service')
-    Service.objects.filter(tier__in=['basic', 'premium', 'deluxe']).delete()
+    # This migration is deprecated and replaced by 0015_update_service_prices_and_structure
+    # Keeping this as a no-op to maintain migration history
+    pass
 
 
 class Migration(migrations.Migration):
