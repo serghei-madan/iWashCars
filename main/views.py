@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.conf import settings
-from .forms import BookingForm
+from .forms import BookingForm, ContactForm
 from .models import Booking, Service, Payment
 from .stripe_utils import StripePaymentService
 from .notification_utils import NotificationService
@@ -248,3 +248,28 @@ def validate_address_api(request):
         })
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+def contact(request):
+    """Contact page with form and company information"""
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Get form data
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            phone = form.cleaned_data.get('phone', 'Not provided')
+            subject = form.cleaned_data['subject']
+            message_text = form.cleaned_data['message']
+
+            # For now, just show a success message
+            # In production, you could send an email here
+            messages.success(
+                request,
+                f'Thank you {name}! We received your message and will get back to you soon at {email}.'
+            )
+            return redirect('contact')
+    else:
+        form = ContactForm()
+
+    return render(request, 'main/contact.html', {'form': form})

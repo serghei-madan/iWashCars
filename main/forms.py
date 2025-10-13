@@ -101,3 +101,57 @@ class BookingForm(forms.ModelForm):
                 })
 
         return cleaned_data
+
+
+class ContactForm(forms.Form):
+    """Simple contact form"""
+    name = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'class': 'input input-bordered w-full',
+            'placeholder': 'Your Name'
+        }),
+        required=True
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'input input-bordered w-full',
+            'placeholder': 'your.email@example.com'
+        }),
+        required=True
+    )
+    phone = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={
+            'class': 'input input-bordered w-full',
+            'placeholder': '(555) 123-4567'
+        }),
+        required=False
+    )
+    subject = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={
+            'class': 'input input-bordered w-full',
+            'placeholder': 'Subject'
+        }),
+        required=True
+    )
+    message = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'textarea textarea-bordered w-full',
+            'placeholder': 'Your message...',
+            'rows': 6
+        }),
+        required=True
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            email = email.strip().lower()
+            email_validator = EmailValidator(message="Enter a valid email address.")
+            try:
+                email_validator(email)
+            except ValidationError:
+                raise ValidationError("Please enter a valid email address.")
+        return email
