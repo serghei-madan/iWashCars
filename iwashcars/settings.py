@@ -215,6 +215,8 @@ Q_CLUSTER = {
 # Production Security Settings
 if not DEBUG:
     # HTTPS/SSL Settings
+    # Trust Railway's proxy headers for HTTPS detection
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
