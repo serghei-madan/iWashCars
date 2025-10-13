@@ -57,6 +57,9 @@
 .inline-flex {
   display: inline-flex;
 }
+.aspect-3\/2 {
+  aspect-ratio: 3/2;
+}
 .aspect-square {
   aspect-ratio: 1 / 1;
 }

@@ -259,7 +259,7 @@
             <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer">
                 <img src="{% static 'images/gallery_1.jpg' %}"
                      alt="Exterior Detailing"
-                     class="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105">
+                     class="w-full aspect-3/2 object-cover transition-transform duration-300 group-hover:scale-105">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end">
                     <h3 class="text-3xl font-bold text-white p-6">Exterior Detailing</h3>
                 </div>
@@ -269,7 +269,7 @@
             <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer">
                 <img src="{% static 'images/gallery_2.jpg' %}"
                      alt="Interior Cleaning"
-                     class="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105">
+                     class="w-full aspect-3/2 object-cover transition-transform duration-300 group-hover:scale-105">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end">
                     <h3 class="text-3xl font-bold text-white p-6">Interior Cleaning</h3>
                 </div>
@@ -279,7 +279,7 @@
             <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer">
                 <img src="{% static 'images/gallery_3.jpg' %}"
                      alt="Premium Wax & Polish"
-                     class="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105">
+                     class="w-full aspect-3/2 object-cover transition-transform duration-300 group-hover:scale-105">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end">
                     <h3 class="text-3xl font-bold text-white p-6">Premium Wax & Polish</h3>
                 </div>
@@ -289,7 +289,7 @@
             <div class="relative overflow-hidden rounded-lg shadow-xl group cursor-pointer">
                 <img src="{% static 'images/gallery_4.jpg' %}"
                      alt="Engine Bay Cleaning"
-                     class="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105">
+                     class="w-full aspect-3/2 object-cover transition-transform duration-300 group-hover:scale-105">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end">
                     <h3 class="text-3xl font-bold text-white p-6">Engine Bay Cleaning</h3>
                 </div>
@@ -523,8 +523,7 @@
 </div>
 
 <!-- CTA -->
-<div class="hero bg-gradient-to-r from-secondary to-accent">
-    <div class="overlay bg-black/90 w-full h-full"></div>
+<div class="hero parallax" style="background-image: url('{% static 'images/home_2.jpg' %}');">
     <div class="py-16">
         <div class="hero-content text-center text-white">
             <div class="max-w-md">
