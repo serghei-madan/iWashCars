@@ -3174,11 +3174,6 @@
   .border-gold {
     border-color: var(--color-gold);
   }
-  .card-gold {
-    backdrop-filter: blur(4px);
-    border: 1px solid hsla(0, 0%, 100%, 0.12156862745098039);
-    background-color: hsla(0, 0%, 100%, 0.05);
-  }
 }
 @layer base {
   :where(:root),:root:has(input.theme-controller[value=light]:checked),[data-theme=light] {

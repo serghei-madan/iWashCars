@@ -2958,6 +2958,10 @@
     --btn-color: var(--color-accent);
     --btn-fg: var(--color-accent-content);
   }
+  .btn-primary {
+    --btn-color: var(--color-primary);
+    --btn-fg: var(--color-primary-content);
+  }
   .btn-secondary {
     --btn-color: var(--color-secondary);
     --btn-fg: var(--color-secondary-content);
@@ -3154,31 +3158,9 @@
     }
   }
 }
-@layer base {
-  :root {
-    --color-gold: #ecc206;
-    --color-gold-content: #000000;
-  }
-}
-@layer components {
-  .btn-gold {
-    --btn-color: var(--color-gold);
-    --btn-fg: var(--color-gold-content);
-  }
-  .bg-gold {
-    background-color: var(--color-gold);
-  }
-  .text-gold {
-    color: var(--color-gold);
-  }
-  .border-gold {
-    border-color: var(--color-gold);
-  }
-  .card-gold {
-    backdrop-filter: blur(4px);
-    border: 1px solid hsla(0, 0%, 100%, 0.12156862745098039);
-    background-color: hsla(0, 0%, 100%, 0.05);
-  }
+:root, :root:has(input.theme-controller[value=light]:checked), [data-theme="light"] {
+  --color-primary: #ecc206 !important;
+  --color-primary-content: #000000 !important;
 }
 @layer base {
   :where(:root),:root:has(input.theme-controller[value=light]:checked),[data-theme=light] {

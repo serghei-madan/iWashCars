@@ -8,13 +8,11 @@
     /* Service card hover effects */
     .card {
         transition: all 0.3s ease-in-out;
-        border: 2px solid transparent;
     }
 
     .card:hover {
         transform: scale(1.05);
-        border-color: #D4AF37;
-        outline: solid 1px #4a00ff;
+        outline: solid 1px #ecc206;
     }
 
     .parallax {
@@ -34,7 +32,7 @@
             <h1 class="text-4xl font-bold mb-5">Premium Mobile <br/> Car Wash</h1>
             <p class="text-md mb-5">We come to you! Professional car washing service at your doorstep. Eco-friendly products, experienced team, and unmatched convenience.</p>
             <div>
-                <a href="{% url 'booking' %}" class="btn btn-primary">Book Your Wash</a>
+                <a href="{% url 'booking' %}" class="btn btn-gold">Book Your Wash</a>
                 <a href="{% url 'services' %}" class="btn btn-outline text-white">Learn More</a>
             </div>
         </div>
@@ -51,7 +49,7 @@
         <div class="grid md:flex justify-center gap-8">
             <!-- Basic Wash Card -->
             <div class="flex justify-center">
-                <div class="card w-80 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                <div class="card w-80 text-white rounded-lg card-gold">
                      <div class="card-body justify-around">
                          <div class="flex justify-between">
                              <h2 class="text-3xl font-bold">Basic</h2>
@@ -84,7 +82,7 @@
                              </li>
                          </ul>
                          <div class="flex justify-between mt-6">
-                             <button class="btn btn-primary">Book Your Wash</button>
+                             <button class="btn btn-gold">Book Your Wash</button>
                              <button class="btn btn-outline text-white">View Details</button>
                          </div>
                      </div>
@@ -92,7 +90,7 @@
             </div>
             <!-- Deluxe Wash Card -->
             <div class="flex justify-center">
-                <div class="card w-80 md:w-96 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                <div class="card w-80 md:w-96 text-white rounded-lg card-gold">
                     <div class="card-body justify-around">
                         <div class="flex justify-between">
                             <h2 class="text-3xl font-bold">Deluxe</h2>
@@ -137,7 +135,7 @@
                             </li>
                         </ul>
                         <div class="flex justify-between mt-6">
-                            <button class="btn btn-primary">Book Your Wash</button>
+                            <button class="btn btn-gold">Book Your Wash</button>
                             <button class="btn btn-outline text-white">View Details</button>
                         </div>
                     </div>
@@ -145,7 +143,7 @@
             </div>
             <!-- Premium Wash Card -->
             <div class="flex justify-center">
-                <div class="card w-80 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                <div class="card w-80 text-white rounded-lg card-gold">
                     <div class="card-body justify-around">
                         <span class="badge badge-xs badge-warning">Most Popular</span>
                         <div class="flex justify-between">
@@ -183,7 +181,7 @@
                             </li>
                         </ul>
                         <div class="flex justify-between mt-6">
-                            <button class="btn btn-primary">Book Your Wash</button>
+                            <button class="btn btn-gold">Book Your Wash</button>
                             <button class="btn btn-outline text-white">View Details</button>
                         </div>
                     </div>
@@ -214,7 +212,7 @@
                 <p class="text-sm leading-relaxed">
                     Our team of experienced professionals uses only the highest quality, biodegradable products and advanced water-saving techniques to ensure your vehicle gets the care it deserves while protecting our environment.
                 </p>
-                <!-- <div class="stats shadow" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                <!-- <div class="stats shadow" class="card-gold">
                     <div class="stat">
                         <div class="stat-figure text-primary">
                             <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -305,7 +303,7 @@
         <div class="block md:flex justify-center gap-8">
 
             <div class="flex justify-center">
-                <div class="card w-80 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                <div class="card w-80 text-white rounded-lg" class="card-gold">
                      <div class="card-body justify-around">
                          <div class="flex justify-between">
                              <h2 class="text-3xl font-bold">Basic</h2>
@@ -338,7 +336,7 @@
                              </li>
                          </ul>
                          <div class="flex justify-between mt-6">
-                             <button class="btn btn-primary">Book Your Wash</button>
+                             <button class="btn btn-gold">Book Your Wash</button>
                              <button class="btn btn-outline text-white">View Details</button>
                          </div>
                      </div>
@@ -346,7 +344,7 @@
             </div>
 
             <div class="flex justify-center">
-                <div class="card w-96 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                <div class="card w-96 text-white rounded-lg" class="card-gold">
                     <div class="card-body justify-around">
                         <div class="flex justify-between">
                             <h2 class="text-3xl font-bold">Deluxe</h2>
@@ -391,7 +389,7 @@
                             </li>
                         </ul>
                         <div class="flex justify-between mt-6">
-                            <button class="btn btn-primary">Book Your Wash</button>
+                            <button class="btn btn-gold">Book Your Wash</button>
                             <button class="btn btn-outline text-white">View Details</button>
                         </div>
                     </div>
@@ -399,7 +397,7 @@
             </div>
 
             <div class="flex justify-center">
-                <div class="card w-80 text-white rounded-lg" style="backdrop-filter: blur(4px); border: 1px solid hsla(0,0%,100%,0.12156862745098039); background-color: hsla(0,0%,100%,0.050980392156862744);">
+                <div class="card w-80 text-white rounded-lg" class="card-gold">
                     <div class="card-body justify-around">
                         <span class="badge badge-xs badge-warning">Most Popular</span>
                         <div class="flex justify-between">
@@ -437,7 +435,7 @@
                             </li>
                         </ul>
                         <div class="flex justify-between mt-6">
-                            <button class="btn btn-primary">Book Your Wash</button>
+                            <button class="btn btn-gold">Book Your Wash</button>
                             <button class="btn btn-outline text-white">View Details</button>
                         </div>
                     </div>
@@ -530,7 +528,7 @@
                 <h2 class="text-4xl font-bold mb-5">Ready to Get Started?</h2>
                 <p class="text-lg mb-8">Book your mobile car wash today and experience the convenience of professional service at your location.</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{% url 'booking' %}" class="btn btn-primary btn-lg">Book Now</a>
+                    <a href="{% url 'booking' %}" class="btn btn-gold btn-lg">Book Now</a>
                     <a href="{% url 'booking' %}" class="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-secondary">Get Quote</a>
                 </div>
             </div>

@@ -1,3 +1,34 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "daisyui";
+
+@layer base {
+  :root {
+    --color-gold: #ecc206;
+    --color-gold-content: #000000;
+  }
+}
+
+@layer components {
+  .btn-gold {
+    --btn-color: var(--color-gold);
+    --btn-fg: var(--color-gold-content);
+  }
+
+  .bg-gold {
+    background-color: var(--color-gold);
+  }
+
+  .text-gold {
+    color: var(--color-gold);
+  }
+
+  .border-gold {
+    border-color: var(--color-gold);
+  }
+
+  .card-gold {
+    backdrop-filter: blur(4px);
+    border: 1px solid hsla(0, 0%, 100%, 0.12156862745098039);
+    background-color: hsla(0, 0%, 100%, 0.05);
+  }
+}
