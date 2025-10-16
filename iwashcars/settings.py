@@ -140,19 +140,29 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Only use STATICFILES_DIRS if the static directory exists (development)
-if (BASE_DIR / "static").exists():
+# Only use STATICFILES_DIRS in development
+# In production, static files are collected to STATIC_ROOT
+if DEBUG and (BASE_DIR / "static").exists():
     STATICFILES_DIRS = [BASE_DIR / "static"]
+elif not DEBUG:
+    # In production, ensure STATICFILES_DIRS is not set
+    # All static files should be in STATIC_ROOT after collectstatic
+    STATICFILES_DIRS = []
 
 # Enable WhiteNoise compression and caching
+# Use CompressedStaticFilesStorage instead of CompressedManifestStaticFilesStorage
+# to avoid manifest-related issues with CSS imports
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
+
+# Alternative: Disable manifest if issues persist
+# WHITENOISE_MANIFEST_STRICT = False
 
 # Media files (User uploaded content)
 MEDIA_URL = '/media/'
@@ -210,6 +220,35 @@ Q_CLUSTER = {
     'cpu_affinity': 1,
     'label': 'Django Q',
     'orm': 'default',
+}
+
+# Logging Configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
 }
 
 # Production Security Settings

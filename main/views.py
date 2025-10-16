@@ -42,7 +42,13 @@ def health_check(request):
 
 def index(request):
     # Get active services for homepage display
-    services = Service.objects.filter(is_active=True).order_by('display_order')
+    try:
+        services = Service.objects.filter(is_active=True).order_by('display_order')
+    except Exception as e:
+        # Log the error but don't crash
+        print(f"Error loading services: {e}")
+        services = []
+
     return render(request, 'main/index.html', {'services': services})
 
 def booking(request):
