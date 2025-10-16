@@ -59,9 +59,10 @@ WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Copy entrypoint script and make it executable
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh && chown appuser:appuser /app/entrypoint.sh
+# Copy entrypoint scripts and make them executable
+COPY entrypoint.sh worker-entrypoint.sh /app/
+RUN chmod +x /app/entrypoint.sh /app/worker-entrypoint.sh && \
+    chown appuser:appuser /app/entrypoint.sh /app/worker-entrypoint.sh
 
 # Copy application code (excluding input.css which is only needed for build)
 COPY --chown=appuser:appuser . .
