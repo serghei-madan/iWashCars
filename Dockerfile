@@ -63,8 +63,11 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh && chown appuser:appuser /app/entrypoint.sh
 
-# Copy application code
+# Copy application code (excluding input.css which is only needed for build)
 COPY --chown=appuser:appuser . .
+
+# Remove input.css from static directory (we only need output.css)
+RUN rm -f /app/static/css/input.css
 
 # Copy built CSS from builder stage
 COPY --from=builder --chown=appuser:appuser /app/static/css/output.css /app/static/css/output.css
