@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.conf import settings
+from django.db import connection
 from .forms import BookingForm, ContactForm
 from .models import Booking, Service, Payment
 from .stripe_utils import StripePaymentService
@@ -11,6 +12,33 @@ from .notification_utils import NotificationService
 from .address_validator import validate_service_area
 import json
 from datetime import datetime, timedelta
+import os
+
+def health_check(request):
+    """Simple health check endpoint for debugging"""
+    try:
+        # Test database connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+
+        db_status = "OK"
+        db_name = settings.DATABASES['default']['NAME']
+    except Exception as e:
+        db_status = f"ERROR: {str(e)}"
+        db_name = "N/A"
+
+    info = {
+        'status': 'ok',
+        'debug': settings.DEBUG,
+        'allowed_hosts': settings.ALLOWED_HOSTS,
+        'database': db_status,
+        'db_name': db_name[:20] if isinstance(db_name, str) else str(db_name),
+        'database_url_set': bool(os.getenv('DATABASE_URL')),
+        'static_root': str(settings.STATIC_ROOT),
+        'static_url': settings.STATIC_URL,
+    }
+
+    return JsonResponse(info)
 
 def index(request):
     # Get active services for homepage display
