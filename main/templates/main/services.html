@@ -3,11 +3,29 @@
 
 {% block title %}iWashCars - Premium Mobile Car Wash Service{% endblock %}
 
+{% block page_head %}
+<style>
+    .parallax {
+        background-attachment: fixed;
+        background-size: 50%;
+        background-position: left;
+        background-repeat: no-repeat;
+    }
+
+    .card {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .card:hover {
+        transform: scale(1.02);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 
     <!-- Hero Section -->
-    <div class="hero min-h-[80vh] bg-cover bg-center text-white relative overflow-hidden" style="background-image: url('{% static 'images/services_1.jpeg' %}');">
+    <div class="hero min-h-[80vh] bg-cover bg-center text-white relative overflow-hidden" style="background-image: url('{% static 'images/services_1.webp' %}');">
         
         <div class="absolute inset-0 bg-black/20"></div>
         <div class="hero-content text-center z-10">
@@ -18,15 +36,15 @@
                 </p>
                 <div class="flex flex-wrap justify-center gap-6">
                     <div class="bg-white/20 backdrop-blur-sm rounded-2xl px-8 py-4 border border-white/30">
-                        <div class="text-sm text-blue-100 uppercase tracking-wider">Services</div>
+                        <div class="text-sm text-white uppercase tracking-wider">Services</div>
                         <div class="text-3xl font-bold">{{ all_services.count }}</div>
                     </div>
                     <div class="bg-white/20 backdrop-blur-sm rounded-2xl px-8 py-4 border border-white/30">
-                        <div class="text-sm text-blue-100 uppercase tracking-wider">Vehicle Types</div>
+                        <div class="text-sm text-white uppercase tracking-wider">Vehicle Types</div>
                         <div class="text-3xl font-bold">{{ services_by_vehicle|length }}</div>
                     </div>
                     <div class="bg-white/20 backdrop-blur-sm rounded-2xl px-8 py-4 border border-white/30">
-                        <div class="text-sm text-blue-100 uppercase tracking-wider">Starting From</div>
+                        <div class="text-sm text-white uppercase tracking-wider">Starting From</div>
                         <div class="text-3xl font-bold">${{ all_services.first.price|default:"--" }}</div>
                     </div>
                 </div>
@@ -39,7 +57,7 @@
 
     <!-- Service Presentations -->
     {% for service in services %}
-    <section class="service-section relative {% if forloop.counter|divisibleby:2 %}bg-base-200{% else %}bg-base-100{% endif %}">
+    <section class="service-section relative bg-black text-white parallax" style="background-image: url('{% static 'images/home_2.jpg' %}');">
         <div class="container mx-auto px-4 py-20">
             <div class="grid lg:grid-cols-2 gap-12 items-center {% if forloop.counter|divisibleby:2 %}lg:grid-flow-dense{% endif %}">
 
@@ -58,38 +76,38 @@
                     </div>
 
                     <!-- Service Name -->
-                    <h3 class="text-5xl font-bold text-gray-800">{{ service.name }}</h3>
+                    <h3 class="text-5xl font-bold text-white">{{ service.name }}</h3>
 
                     <!-- Description -->
-                    <p class="text-xl text-gray-600 leading-relaxed">{{ service.description }}</p>
+                    <p class="text-xl text-white/90 leading-relaxed">{{ service.description }}</p>
 
                     <!-- Pricing & Duration -->
                     <div class="flex flex-wrap gap-4">
-                        <div class="bg-primary text-primary-content rounded-2xl px-8 py-4 shadow-lg">
+                        <div class="bg-white/10 backdrop-blur-sm text-white rounded-2xl px-8 py-4 shadow-lg border border-white/20">
                             <div class="text-sm uppercase tracking-wider opacity-90">Price</div>
                             <div class="text-4xl font-bold">${{ service.price }}</div>
                         </div>
-                        <div class="bg-base-300 rounded-2xl px-8 py-4 shadow-lg">
-                            <div class="text-sm uppercase tracking-wider text-gray-600">Duration</div>
-                            <div class="text-4xl font-bold text-gray-800">{{ service.get_duration_display }}</div>
+                        <div class="bg-white/10 backdrop-blur-sm text-white rounded-2xl px-8 py-4 shadow-lg border border-white/20">
+                            <div class="text-sm uppercase tracking-wider opacity-90">Duration</div>
+                            <div class="text-4xl font-bold">{{ service.get_duration_display }}</div>
                         </div>
-                        <div class="bg-info/20 text-info-content rounded-2xl px-8 py-4 shadow-lg">
-                            <div class="text-sm uppercase tracking-wider">Deposit</div>
+                        <div class="bg-white/10 backdrop-blur-sm text-white rounded-2xl px-8 py-4 shadow-lg border border-white/20">
+                            <div class="text-sm uppercase tracking-wider opacity-90">Deposit</div>
                             <div class="text-4xl font-bold">${{ service.get_deposit_amount_dollars }}</div>
                         </div>
                     </div>
 
                     <!-- Features -->
                     {% if service.features %}
-                    <div class="bg-base-100 rounded-2xl p-6 shadow-lg {% if forloop.counter|divisibleby:2 %}bg-base-300{% endif %}">
-                        <h4 class="text-2xl font-bold mb-4 text-gray-800">What's Included</h4>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
+                        <h4 class="text-2xl font-bold mb-4 text-white">What's Included</h4>
                         <div class="grid md:grid-cols-2 gap-3">
                             {% for feature in service.features %}
                             <div class="flex items-start gap-3">
                                 <svg class="w-6 h-6 text-success flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                                 </svg>
-                                <span class="text-gray-700 text-lg">{{ feature }}</span>
+                                <span class="text-white text-lg">{{ feature }}</span>
                             </div>
                             {% endfor %}
                         </div>
@@ -98,13 +116,13 @@
 
                     <!-- Action Buttons -->
                     <div class="flex flex-wrap gap-4 pt-4">
-                        <a href="{% url 'booking' %}" class="btn {% if service.tier == 'premium' %}btn-secondary{% elif service.tier == 'deluxe' %}btn-accent{% else %}btn-gold{% endif %} btn-lg text-lg px-8">
+                        <a href="{% url 'booking' %}" class="btn btn-gold btn-lg text-lg px-8">
                             <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             Book This Service
                         </a>
-                        <a href="{% url 'service_detail' service.id %}" class="btn btn-outline btn-lg text-lg px-8">
+                        <a href="{% url 'service_detail' service.id %}" class="btn btn-outline btn-lg text-lg px-8 text-white border-white hover:bg-white hover:text-black">
                             View Full Details
                         </a>
                     </div>
@@ -157,7 +175,7 @@
                             {% endfor %}
                             {% if service.images.all|length > 3 %}
                             <div class="col-span-2 text-center">
-                                <a href="{% url 'service_detail' service.id %}" class="btn btn-outline btn-sm">
+                                <a href="{% url 'service_detail' service.id %}" class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-black">
                                     +{{ service.images.all|length|add:"-3" }} More Photos
                                 </a>
                             </div>
@@ -168,14 +186,14 @@
                         <!-- Image Modals -->
                         {% for image in service.images.all %}
                         <dialog id="modal-{{ service.id }}-{{ forloop.counter0 }}" class="modal">
-                            <div class="modal-box max-w-6xl p-0">
+                            <div class="modal-box max-w-6xl p-0 bg-black border border-white/20">
                                 <form method="dialog">
                                     <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 z-10 bg-black/50 text-white hover:bg-black/70">✕</button>
                                 </form>
                                 <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:service.name }}" class="w-full rounded-2xl">
                                 {% if image.alt_text %}
                                 <div class="p-6">
-                                    <p class="text-center text-gray-600">{{ image.alt_text }}</p>
+                                    <p class="text-center text-white">{{ image.alt_text }}</p>
                                 </div>
                                 {% endif %}
                             </div>
@@ -187,7 +205,7 @@
                     </div>
                     {% else %}
                     <!-- Placeholder when no images -->
-                    <div class="rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 h-[500px] flex items-center justify-center">
+                    <div class="rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-800 via-gray-900 to-black h-[500px] flex items-center justify-center border border-white/20">
                         <div class="text-center text-white">
                             <div class="text-9xl mb-4">
                                 {% if service.tier == 'basic' %}🧽
@@ -206,49 +224,49 @@
     {% endfor %}
 
     {% if not forloop.last %}
-    <div class="divider my-0"></div>
+    <div class="divider my-0 opacity-20"></div>
     {% endif %}
     {% empty %}
-    <div class="min-h-screen flex items-center justify-center">
+    <div class="min-h-screen flex items-center justify-center bg-black text-white">
         <div class="text-center py-16">
             <div class="text-8xl mb-6">🚗</div>
             <h3 class="text-4xl font-bold mb-4">No Services Available</h3>
-            <p class="text-xl text-gray-600">We're currently updating our service offerings. Please check back soon!</p>
+            <p class="text-xl text-white/70">We're currently updating our service offerings. Please check back soon!</p>
         </div>
     </div>
     {% endfor %}
 
     <!-- Why Choose Us Section -->
-    <div class="bg-gradient-to-b from-base-200 to-base-100 py-20">
+    <div class="bg-black text-white py-20 parallax" style="background-image: url('{% static 'images/home_2.jpg' %}');">
         <div class="container mx-auto px-4">
             <h2 class="text-5xl font-bold text-center mb-16">Why Choose iWashCars?</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                <div class="card bg-white/10 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl hover:scale-105 transition-all">
                     <div class="card-body items-center text-center">
                         <div class="text-6xl mb-4">📱</div>
-                        <h3 class="card-title text-2xl">Easy Booking</h3>
-                        <p class="text-gray-600">Book online in just a few clicks with our simple booking system</p>
+                        <h3 class="card-title text-2xl text-white">Easy Booking</h3>
+                        <p class="text-white/80">Book online in just a few clicks with our simple booking system</p>
                     </div>
                 </div>
-                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                <div class="card bg-white/10 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl hover:scale-105 transition-all">
                     <div class="card-body items-center text-center">
                         <div class="text-6xl mb-4">🌿</div>
-                        <h3 class="card-title text-2xl">Eco-Friendly</h3>
-                        <p class="text-gray-600">Biodegradable products and water-saving techniques</p>
+                        <h3 class="card-title text-2xl text-white">Eco-Friendly</h3>
+                        <p class="text-white/80">Biodegradable products and water-saving techniques</p>
                     </div>
                 </div>
-                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                <div class="card bg-white/10 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl hover:scale-105 transition-all">
                     <div class="card-body items-center text-center">
                         <div class="text-6xl mb-4">⚡</div>
-                        <h3 class="card-title text-2xl">Fast Service</h3>
-                        <p class="text-gray-600">Professional wash completed quickly without compromising quality</p>
+                        <h3 class="card-title text-2xl text-white">Fast Service</h3>
+                        <p class="text-white/80">Professional wash completed quickly without compromising quality</p>
                     </div>
                 </div>
-                <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                <div class="card bg-white/10 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl hover:scale-105 transition-all">
                     <div class="card-body items-center text-center">
                         <div class="text-6xl mb-4">💯</div>
-                        <h3 class="card-title text-2xl">Guaranteed</h3>
-                        <p class="text-gray-600">100% satisfaction or we'll re-wash for free</p>
+                        <h3 class="card-title text-2xl text-white">Guaranteed</h3>
+                        <p class="text-white/80">100% satisfaction or we'll re-wash for free</p>
                     </div>
                 </div>
             </div>
