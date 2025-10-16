@@ -1,22 +1,38 @@
 {% load static %}
 <!-- Navbar -->
 <div class="navbar bg-black shadow-sm text-white px-4">
-    <div class="navbar-start">
-        <div class="dropdown">
-            <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+    <div class="navbar-start" x-data="{ mobileMenuOpen: false }">
+        <div class="lg:hidden">
+            <button @click="mobileMenuOpen = true" class="btn btn-ghost">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /> </svg>
+            </button>
+            <div x-show="mobileMenuOpen"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 transform -translate-x-full"
+                    x-transition:enter-end="opacity-100 transform translate-x-0"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100 transform translate-x-0"
+                    x-transition:leave-end="opacity-0 transform -translate-x-full"
+                    class="fixed inset-0 z-50 p-6"
+                    @click.away="mobileMenuOpen = false"
+                    style="background-color: hsl(0deg 0% 0% / 84%); backdrop-filter: blur(5px);"
+                >
+                <div class="text-white flex justify-between mb-8">
+                    <a href="/" class="btn btn-ghost text-xl pt-2">
+                        iWashCars
+                    </a>
+                    <button @click="mobileMenuOpen = false" class="btn btn-ghost p-6 !text-2xl">
+                        X                         
+                    </button>
+                </div>
+                <ul class="menu text-white w-full">
+                    <li><a href="/" class="text-xl text-center py-6 m-auto" @click="mobileMenuOpen = false">Home</a></li>
+                    <li><a href="#about" class="text-xl text-center py-6 m-auto" @click="mobileMenuOpen = false">About</a></li>
+                    <li><a href="/services/" class="text-xl text-center py-6 m-auto" @click="mobileMenuOpen = false">Services</a></li>
+                    <li><a href="/contact/" class="text-xl text-center py-6 m-auto" @click="mobileMenuOpen = false">Contact</a></li>
+                    <li><a href="/booking/" class="text-xl text-center py-6 m-auto" @click="mobileMenuOpen = false">Booking</a></li>
+                </ul>
             </div>
-            <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                <li><a>Item 1</a></li>
-                <li>
-                    <a>Parent</a>
-                    <ul class="p-2">
-                        <li><a>Submenu 1</a></li>
-                        <li><a>Submenu 2</a></li>
-                    </ul>
-                </li>
-                <li><a>Item 3</a></li>
-            </ul>
         </div>
     <a href="/" class="btn btn-ghost text-xl">
         iWashCars
@@ -24,6 +40,7 @@
     </div>
     <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1">
+            <li><a href="/" class="hover:bg-primary-focus">Home</a></li>
             <li><a href="#about" class="hover:bg-primary-focus">About</a></li>
             <li><a href="/services/" class="hover:bg-primary-focus">Services</a></li>
             <li><a href="/contact/" class="hover:bg-primary-focus">Contact</a></li>
