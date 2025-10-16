@@ -6,18 +6,32 @@ FROM python:3.10-slim AS builder
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies needed for Python packages
+# Install system dependencies needed for Python packages and Node.js
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     libjpeg-dev \
     zlib1g-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 20.x
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python packages
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
+
+# Copy package.json and install Node dependencies
+COPY package.json package-lock.json* ./
+RUN npm install
+
+# Copy static files and build CSS
+COPY static ./static
+RUN npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
 
 # Stage 2: Runtime - Create production image
 FROM python:3.10-slim
@@ -51,6 +65,9 @@ RUN chmod +x /app/entrypoint.sh && chown appuser:appuser /app/entrypoint.sh
 
 # Copy application code
 COPY --chown=appuser:appuser . .
+
+# Copy built CSS from builder stage
+COPY --from=builder --chown=appuser:appuser /app/static/css/output.css /app/static/css/output.css
 
 # Switch to non-root user
 USER appuser
