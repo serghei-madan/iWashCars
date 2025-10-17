@@ -29,6 +29,13 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY package.json package-lock.json* ./
 RUN npm install
 
+# Copy tailwind config
+COPY tailwind.config.js ./
+
+# Copy templates so Tailwind can scan them for classes
+COPY main ./main
+COPY iwashcars ./iwashcars
+
 # Copy static files and build CSS
 COPY static ./static
 RUN npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
